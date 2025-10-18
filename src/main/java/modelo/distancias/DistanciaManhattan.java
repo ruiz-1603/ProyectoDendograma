@@ -1,6 +1,6 @@
 package modelo.distancias;
 
-import modelo.estructuras.*;
+import modelo.estructuras.Vector;
 
 public class DistanciaManhattan implements ICalculadorDistancia {
 
