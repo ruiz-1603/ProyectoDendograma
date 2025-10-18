@@ -1,14 +1,7 @@
 package modelo.distancias;
 
-import modelo.estructuras.Vector;
+import modelo.estructuras.*;
 
-/**
- * Distancia Euclidiana (L2)
- * Mide la distancia en línea recta entre dos puntos
- * Fórmula: d(x,y) = √(Σ(xi - yi)²)
- *
- * Complejidad: O(n) donde n es la dimensión del vector
- */
 public class DistanciaEuclidiana implements ICalculadorDistancia {
 
     @Override

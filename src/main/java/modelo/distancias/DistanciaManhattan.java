@@ -1,17 +1,7 @@
 package modelo.distancias;
 
-import modelo.estructuras.Vector;
+import modelo.estructuras.*;
 
-/**
- * Distancia Manhattan (L1 o de bloque)
- * Suma las diferencias absolutas en cada dimensión
- * Fórmula: d(x,y) = Σ|xi - yi|
- *
- * Usada en modelos lineales y redes neuronales
- * También conocida como distancia de taxicab o city block
- *
- * Complejidad: O(n) donde n es la dimensión del vector
- */
 public class DistanciaManhattan implements ICalculadorDistancia {
 
     @Override

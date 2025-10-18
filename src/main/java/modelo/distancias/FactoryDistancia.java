@@ -2,7 +2,6 @@ package modelo.distancias;
 
 public class FactoryDistancia {
 
-
     public enum TipoDistancia {
         EUCLIDIANA,
         MANHATTAN,
@@ -31,13 +30,6 @@ public class FactoryDistancia {
         }
     }
 
-    /**
-     * Crea un calculador de distancia desde un nombre de texto
-     * Útil para interfaces de usuario
-     *
-     * @param nombre Nombre del tipo de distancia (case-insensitive)
-     * @return Instancia del calculador correspondiente
-     */
     public static ICalculadorDistancia crear(String nombre) {
         if (nombre == null) {
             throw new IllegalArgumentException("El nombre no puede ser null");
@@ -73,21 +65,10 @@ public class FactoryDistancia {
         }
     }
 
-    /**
-     * Retorna todos los tipos de distancia disponibles
-     * Útil para poblar ComboBox en la UI
-     *
-     * @return Array con todos los tipos disponibles
-     */
     public static TipoDistancia[] getTiposDisponibles() {
         return TipoDistancia.values();
     }
 
-    /**
-     * Retorna los nombres de todas las distancias disponibles
-     *
-     * @return Array de strings con los nombres
-     */
     public static String[] obtenerNombresDisponibles() {
         TipoDistancia[] tipos = TipoDistancia.values();
         String[] nombres = new String[tipos.length];
@@ -100,12 +81,6 @@ public class FactoryDistancia {
         return nombres;
     }
 
-    /**
-     * Valida si un nombre de distancia es válido
-     *
-     * @param nombre Nombre a validar
-     * @return true si es válido, false en caso contrario
-     */
     public static boolean esNombreValido(String nombre) {
         try {
             crear(nombre);

@@ -1,21 +1,7 @@
 package modelo.distancias;
 
-import modelo.estructuras.Vector;
+import modelo.estructuras.*;
 
-/**
- * Distancia Coseno
- * Mide el ángulo entre dos vectores, no su magnitud
- * Fórmula: d(x,y) = 1 - (x·y)/(||x|| * ||y||)
- *
- * Donde:
- * - x·y es el producto punto
- * - ||x|| es la norma (magnitud) del vector x
- *
- * Nota: En el proyecto anterior era similaridad (sin el 1-)
- * pero aquí se solicita distancia (restando de 1)
- *
- * Complejidad: O(n) donde n es la dimensión del vector
- */
 public class DistanciaCoseno implements ICalculadorDistancia {
 
     @Override

@@ -1,22 +1,7 @@
 package modelo.distancias;
 
-import modelo.estructuras.Vector;
+import modelo.estructuras.*;
 
-/**
- * Distancia de Hamming
- * Cuenta el número de posiciones donde los vectores difieren
- * Fórmula: d(x,y) = Σ(xi ≠ yi)
- *
- * Originalmente diseñada para vectores binarios o discretos
- * pero adaptada para valores continuos con un umbral de tolerancia
- *
- * Usada en:
- * - Cadenas binarias
- * - Genética (comparación de secuencias)
- * - Detección de errores
- *
- * Complejidad: O(n) donde n es la dimensión del vector
- */
 public class DistanciaHamming implements ICalculadorDistancia {
 
     private static final double TOLERANCIA = 1e-9;
