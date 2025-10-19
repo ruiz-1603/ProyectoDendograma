@@ -11,10 +11,10 @@ import java.util.*;
 public class MotorCluster {
 
     public enum TipoEnlace {
-        MINIMO,      // Distancia mínima entre clusters
-        MAXIMO,      // Distancia máxima entre clusters
-        PROMEDIO,    // Distancia promedio entre clusters
-        CENTROIDE    // Distancia entre centroides
+        MINIMO,      // Single linkage
+        MAXIMO,      // Complete linkage
+        PROMEDIO,    // Average linkage
+        CENTROIDE    // Centroid linkage
     }
 
     private Vector[] vectores;
@@ -23,6 +23,7 @@ public class MotorCluster {
     private List<Double> distanciasFusion;
     private TipoEnlace tipoEnlace;
     private CalculadorMatrizDistancia calculador;
+    private int[] tamanoClusters; // Tamaño de cada cluster para PROMEDIO
 
     /**
      * Constructor con tipo de enlace por defecto (PROMEDIO)
@@ -33,6 +34,7 @@ public class MotorCluster {
         this.clusters = new ArrayList<>();
         this.distanciasFusion = new ArrayList<>();
         this.calculador = new CalculadorMatrizDistancia();
+        this.tamanoClusters = new int[0];
     }
 
     /**
@@ -44,13 +46,14 @@ public class MotorCluster {
         this.clusters = new ArrayList<>();
         this.distanciasFusion = new ArrayList<>();
         this.calculador = new CalculadorMatrizDistancia();
+        this.tamanoClusters = new int[0];
     }
 
     /**
-     * Ejecuta el algoritmo de clustering jerárquico
-     * Complejidad: O(n³) en el peor caso
+     * Ejecuta el algoritmo de clustering jerárquico con Lance-Williams
+     * Complejidad: O(n²)
      *
-     * @param vectores      Array de vectores normalizados
+     * @param vectores Array de vectores normalizados
      * @param tipoDistancia Métrica de distancia a usar
      * @return Nodo raíz del dendrograma
      */
@@ -63,39 +66,59 @@ public class MotorCluster {
         this.distanciasFusion.clear();
 
         // Paso 1: Crear matriz de distancias inicial
+        System.out.println("  [Clustering] Calculando matriz de distancias inicial...");
         matrizDistancias = calculador.calcular(vectores, tipoDistancia);
 
-        // Paso 2: Inicializar clusters (cada vector es un cluster inicial)
+        // Paso 2: Inicializar clusters y tamaños
         inicializarClusters();
 
-        // Paso 3: Algoritmo aglomerativo
+        // Paso 3: Algoritmo aglomerativo con Lance-Williams
+        int iteracion = 0;
+        long inicio = System.currentTimeMillis();
+
         while (clusters.size() > 1) {
+            iteracion++;
+            if (iteracion % 100 == 0) {
+                System.out.println("  [Clustering] Iteración " + iteracion +
+                        " - Clusters restantes: " + clusters.size());
+            }
+
             // Encontrar par más cercano
             int[] parMin = encontrarParMasProximo();
             int i = parMin[0];
             int j = parMin[1];
 
-            double distanciaFusion = obtenerDistanciaCluster(i, j);
+            double distanciaFusion = matrizDistancias.getPosicion(i, j);
             distanciasFusion.add(distanciaFusion);
 
             // Crear nuevo cluster fusionando i y j
             Nodo nuevoCluster = new Nodo(clusters.get(i), clusters.get(j), distanciaFusion);
+            int nuevoTamano = tamanoClusters[i] + tamanoClusters[j];
 
-            // Remover los clusters viejos (primero el mayor índice para no afectar índices)
+            // Actualizar matriz con Lance-Williams (sin recalcular todo)
+            actualizarMatrizLanceWilliams(i, j, distanciaFusion);
+
+            // Remover los clusters viejos (primero el mayor índice)
             if (i > j) {
                 clusters.remove(i);
+                tamanoClusters = removerIndice(tamanoClusters, i);
                 clusters.remove(j);
+                tamanoClusters = removerIndice(tamanoClusters, j);
             } else {
                 clusters.remove(j);
+                tamanoClusters = removerIndice(tamanoClusters, j);
                 clusters.remove(i);
+                tamanoClusters = removerIndice(tamanoClusters, i);
             }
 
             // Agregar nuevo cluster
             clusters.add(nuevoCluster);
-
-            // Recalcular distancias entre el nuevo cluster y los restantes
-            recalcularDistancias();
+            tamanoClusters = agregarElemento(tamanoClusters, nuevoTamano);
         }
+
+        long duracion = System.currentTimeMillis() - inicio;
+        System.out.println("  [Clustering] Completado en " + (duracion / 1000.0) + " segundos");
+        System.out.println("  [Clustering] Total de fusiones: " + distanciasFusion.size());
 
         // Paso 4: Retornar raíz del dendrograma
         return clusters.get(0);
@@ -103,7 +126,7 @@ public class MotorCluster {
 
     /**
      * Ejecuta clustering con nombre de distancia en string
-     * Complejidad: O(n³)
+     * Complejidad: O(n²)
      */
     public Nodo construirDendrograma(Vector[] vectores, String nombreDistancia) {
         FactoryDistancia.TipoDistancia tipo = FactoryDistancia.TipoDistancia.valueOf(
@@ -118,8 +141,11 @@ public class MotorCluster {
      */
     private void inicializarClusters() {
         clusters.clear();
-        for (Vector v : vectores) {
-            clusters.add(new Nodo(v.getEtiqueta()));
+        tamanoClusters = new int[vectores.length];
+
+        for (int i = 0; i < vectores.length; i++) {
+            clusters.add(new Nodo(vectores[i].getEtiqueta()));
+            tamanoClusters[i] = 1;
         }
     }
 
@@ -133,7 +159,7 @@ public class MotorCluster {
 
         for (int i = 0; i < clusters.size(); i++) {
             for (int j = i + 1; j < clusters.size(); j++) {
-                double distancia = obtenerDistanciaCluster(i, j);
+                double distancia = matrizDistancias.getPosicion(i, j);
                 if (distancia < minimo) {
                     minimo = distancia;
                     resultado[0] = i;
@@ -146,161 +172,91 @@ public class MotorCluster {
     }
 
     /**
-     * Obtiene la distancia entre dos clusters según el tipo de enlace
-     * Complejidad: O(n²) en el peor caso (AVERAGE)
+     * Actualiza la matriz de distancias usando fórmula Lance-Williams
+     * EN LUGAR de recalcular toda la matriz
+     *
+     * Fórmula: d(nuevo, k) = α*d(i,k) + β*d(j,k) + γ*d(i,j)
+     *
+     * Complejidad: O(n) - solo actualiza n-2 distancias
      */
-    private double obtenerDistanciaCluster(int indiceCluster1, int indiceCluster2) {
-        Nodo cluster1 = clusters.get(indiceCluster1);
-        Nodo cluster2 = clusters.get(indiceCluster2);
+    private void actualizarMatrizLanceWilliams(int i, int j, double distanciaIJ) {
+        int ni = tamanoClusters[i];
+        int nj = tamanoClusters[j];
 
+        double alpha_i, alpha_j, gamma;
+
+        // Calcular parámetros según tipo de enlace
         switch (tipoEnlace) {
             case MINIMO:
-                return calcularDistanciaMinimo(cluster1, cluster2);
+                alpha_i = 0.5;
+                alpha_j = 0.5;
+                gamma = -0.5;
+                break;
             case MAXIMO:
-                return calcularDistanciaMaximo(cluster1, cluster2);
+                alpha_i = 0.5;
+                alpha_j = 0.5;
+                gamma = 0.5;
+                break;
             case PROMEDIO:
-                return calcularDistanciaPromedio(cluster1, cluster2);
+                alpha_i = (double) ni / (ni + nj);
+                alpha_j = (double) nj / (ni + nj);
+                gamma = 0.0;
+                break;
             case CENTROIDE:
-                return calcularDistanciaCentroide(cluster1, cluster2);
+                alpha_i = (double) ni / (ni + nj);
+                alpha_j = (double) nj / (ni + nj);
+                gamma = -((double) ni * nj) / ((ni + nj) * (ni + nj));
+                break;
             default:
                 throw new IllegalArgumentException("Tipo de enlace no soportado");
         }
+
+        // Actualizar distancias del nuevo cluster con todos los demás
+        for (int k = 0; k < clusters.size(); k++) {
+            if (k == i || k == j) continue;
+
+            double distanciaIK = matrizDistancias.getPosicion(i, k);
+            double distanciaJK = matrizDistancias.getPosicion(j, k);
+
+            // Aplicar fórmula Lance-Williams
+            double nuevaDistancia = alpha_i * distanciaIK +
+                    alpha_j * distanciaJK +
+                    gamma * distanciaIJ;
+
+            // Guardar en posición i (remplazaremos i con nuevo cluster)
+            matrizDistancias.setPosicion(i, k, nuevaDistancia);
+            matrizDistancias.setPosicion(k, i, nuevaDistancia);
+        }
     }
 
     /**
-     * Linkage MINIMO: distancia mínima entre elementos de dos clusters
-     * Complejidad: O(n*m)
-     */
-    private double calcularDistanciaMinimo(Nodo c1, Nodo c2) {
-        double minimo = Double.MAX_VALUE;
-
-        List<Integer> indices1 = obtenerIndicesElementos(c1);
-        List<Integer> indices2 = obtenerIndicesElementos(c2);
-
-        for (int i : indices1) {
-            for (int j : indices2) {
-                double dist = matrizDistancias.getPosicion(i, j);
-                minimo = Math.min(minimo, dist);
-            }
-        }
-
-        return minimo;
-    }
-
-    /**
-     * Linkage MAXIMO: distancia máxima entre elementos de dos clusters
-     * Complejidad: O(n*m)
-     */
-    private double calcularDistanciaMaximo(Nodo c1, Nodo c2) {
-        double maximo = Double.MIN_VALUE;
-
-        List<Integer> indices1 = obtenerIndicesElementos(c1);
-        List<Integer> indices2 = obtenerIndicesElementos(c2);
-
-        for (int i : indices1) {
-            for (int j : indices2) {
-                double dist = matrizDistancias.getPosicion(i, j);
-                maximo = Math.max(maximo, dist);
-            }
-        }
-
-        return maximo;
-    }
-
-    /**
-     * Linkage PROMEDIO: distancia promedio entre elementos de dos clusters
-     * Complejidad: O(n*m)
-     */
-    private double calcularDistanciaPromedio(Nodo c1, Nodo c2) {
-        double suma = 0.0;
-        int contador = 0;
-
-        List<Integer> indices1 = obtenerIndicesElementos(c1);
-        List<Integer> indices2 = obtenerIndicesElementos(c2);
-
-        for (int i : indices1) {
-            for (int j : indices2) {
-                suma += matrizDistancias.getPosicion(i, j);
-                contador++;
-            }
-        }
-
-        return suma / contador;
-    }
-
-    /**
-     * Linkage CENTROIDE: distancia entre centroides de clusters
-     * Complejidad: O(n*m)
-     */
-    private double calcularDistanciaCentroide(Nodo c1, Nodo c2) {
-        double[] centroide1 = calcularCentroide(c1);
-        double[] centroide2 = calcularCentroide(c2);
-
-        // Distancia euclidiana entre centroides
-        double suma = 0.0;
-        for (int i = 0; i < centroide1.length; i++) {
-            double diff = centroide1[i] - centroide2[i];
-            suma += diff * diff;
-        }
-
-        return Math.sqrt(suma);
-    }
-
-    /**
-     * Calcula el centroide de un cluster
-     * Complejidad: O(n*m)
-     */
-    private double[] calcularCentroide(Nodo cluster) {
-        List<Integer> indices = obtenerIndicesElementos(cluster);
-        int dimension = vectores[0].dimension();
-        double[] centroide = new double[dimension];
-
-        for (int idx : indices) {
-            for (int d = 0; d < dimension; d++) {
-                centroide[d] += vectores[idx].getPosicion(d);
-            }
-        }
-
-        for (int d = 0; d < dimension; d++) {
-            centroide[d] /= indices.size();
-        }
-
-        return centroide;
-    }
-
-    /**
-     * Obtiene índices de elementos originales en un cluster (hojas del árbol)
+     * Utilidad: remover un elemento de un array int
      * Complejidad: O(n)
      */
-    private List<Integer> obtenerIndicesElementos(Nodo cluster) {
-        List<Integer> indices = new ArrayList<>();
-        Set<String> elementos = cluster.getElementos();
-
-        for (int i = 0; i < vectores.length; i++) {
-            if (elementos.contains(vectores[i].getEtiqueta())) {
-                indices.add(i);
+    private int[] removerIndice(int[] array, int indice) {
+        int[] resultado = new int[array.length - 1];
+        int pos = 0;
+        for (int i = 0; i < array.length; i++) {
+            if (i != indice) {
+                resultado[pos++] = array[i];
             }
         }
-
-        return indices;
+        return resultado;
     }
 
     /**
-     * Recalcula la matriz de distancias después de una fusión
-     * En versión simple, recalculamos todo (O(n²*m))
-     * Complejidad: O(n²*m)
+     * Utilidad: agregar un elemento a un array int
+     * Complejidad: O(n)
      */
-    private void recalcularDistancias() {
-        // Nota: Esto es una recalculación completa naïve
-        // Para optimización, se podrían usar fórmulas incrementales
-        // pero esto afecta según el tipo de linkage usado
-
-        // Por ahora, mantenemos la matriz como referencia
-        // El siguiente clustering usará los índices correctos
+    private int[] agregarElemento(int[] array, int elemento) {
+        int[] resultado = new int[array.length + 1];
+        System.arraycopy(array, 0, resultado, 0, array.length);
+        resultado[array.length] = elemento;
+        return resultado;
     }
 
     /**
-     * Obtiene lista de distancias de fusión en orden
+     * Obtiene lista de distancias de fusión
      * Complejidad: O(n)
      */
     public List<Double> obtenerDistanciasFusion() {
@@ -316,7 +272,7 @@ public class MotorCluster {
     }
 
     /**
-     * Establece el tipo de enlace a usar
+     * Establece el tipo de enlace
      * Complejidad: O(1)
      */
     public void setTipoEnlace(TipoEnlace tipo) {
@@ -338,7 +294,7 @@ public class MotorCluster {
     public void imprimirDendrograma(Nodo raiz) {
         System.out.println("=== Dendrograma ===");
         System.out.println("Tipo de enlace: " + tipoEnlace);
-        System.out.println("Distancias de fusión: " + distanciasFusion);
+        System.out.println("Distancias de fusión: " + distanciasFusion.size());
         System.out.println();
         System.out.println(raiz.toStringArbol());
     }
@@ -366,7 +322,7 @@ public class MotorCluster {
 
     @Override
     public String toString() {
-        return "MotorClusteringJerarquico [tipo=" + tipoEnlace + ", vectores=" +
+        return "MotorCluster [tipo=" + tipoEnlace + ", vectores=" +
                 (vectores != null ? vectores.length : 0) + "]";
     }
 }
