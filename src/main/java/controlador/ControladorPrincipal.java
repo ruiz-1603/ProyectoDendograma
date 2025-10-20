@@ -1,8 +1,11 @@
 package controlador;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import modelo.datos.CargadorCSV;
@@ -148,10 +151,37 @@ public class ControladorPrincipal {
      */
     @FXML
     private void onConfigurarPesos() {
-        // TODO: Abrir ventana de configuración de pesos
-        mostrarInformacion("Configurar Pesos",
-                "Ventana de configuración de pesos próximamente...\n" +
-                        "Por ahora todos los pesos están en 1.0");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/pantalla-pesos.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = new Stage();
+            stage.setTitle("Configurar Pesos");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            // --- INICIO DE CAMBIOS ---
+            stage.setWidth(450);
+            stage.setHeight(600);
+            stage.setMinWidth(350);
+            stage.setMinHeight(400);
+            // --- FIN DE CAMBIOS ---
+
+            ControladorPesos controller = loader.getController();
+            controller.inicializarDatos(ponderador.getNombresDimensiones(), ponderador.getPesos());
+
+            stage.showAndWait();
+
+            if (controller.isGuardado()) {
+                double[] nuevosPesos = controller.getNuevosPesos();
+                ponderador = new Ponderador(nuevosPesos, cargador.getNombresDimensiones());
+                lblEstado.setText("Pesos actualizados correctamente.");
+            }
+
+        } catch (IOException e) {
+            mostrarError("Error al abrir configuración", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
