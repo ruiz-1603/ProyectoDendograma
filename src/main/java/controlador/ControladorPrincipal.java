@@ -22,12 +22,8 @@ import modelo.clustering.Ponderador;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 
-/**
- * Controlador principal de la aplicación
- * Patrón: MVC - Controlador
- * Maneja la interacción entre la vista y el modelo
- */
 public class ControladorPrincipal {
 
     // Elementos de la UI (Vista)
@@ -52,37 +48,26 @@ public class ControladorPrincipal {
     private Nodo dendrogramaRaiz;
     private File archivoCSV;
 
-    /**
-     * Inicializa el controlador después de cargar el FXML
-     */
     @FXML
     public void initialize() {
-        // Inicializar ComboBox de Normalización
         cmbNormalizacion.getItems().addAll("Min-Max", "Z-Score", "Logarítmica");
         cmbNormalizacion.setValue("Min-Max");
 
-        // Inicializar ComboBox de Distancia
         cmbDistancia.getItems().addAll("Euclidiana", "Manhattan", "Coseno", "Hamming");
         cmbDistancia.setValue("Euclidiana");
 
-        // Inicializar ComboBox de Tipo de Enlace
         cmbTipoEnlace.getItems().addAll("Promedio", "Mínimo", "Máximo", "Centroide");
         cmbTipoEnlace.setValue("Promedio");
 
-        // Deshabilitar botones hasta cargar CSV
         btnConfigurarPesos.setDisable(true);
         btnSeleccionarVariables.setDisable(true);
         btnEjecutar.setDisable(true);
         btnExportarJSON.setDisable(true);
 
-        // Ocultar barra de progreso
         progressBar.setVisible(false);
         lblEstado.setText("Esperando carga de archivo CSV...");
     }
 
-    /**
-     * Maneja el evento de cargar archivo CSV
-     */
     @FXML
     private void onCargarCSV() {
         FileChooser fileChooser = new FileChooser();
@@ -99,9 +84,6 @@ public class ControladorPrincipal {
         }
     }
 
-    /**
-     * Carga el archivo CSV
-     */
     private void cargarArchivo(File archivo) {
         try {
             lblEstado.setText("Cargando archivo CSV...");
@@ -112,27 +94,15 @@ public class ControladorPrincipal {
 
             vectores = cargador.getVectores();
 
-            // Inicializar selector con todas las columnas
             selector = new SelectorColumnas(cargador.getNombresDimensiones());
 
-            // Inicializar ponderador sin pesos (todos 1.0)
             double[] pesos = new double[cargador.getDimensiones()];
-            for (int i = 0; i < pesos.length; i++) {
-                pesos[i] = 1.0;
-            }
+            Arrays.fill(pesos, 1.0);
             ponderador = new Ponderador(pesos, cargador.getNombresDimensiones());
 
-            // Actualizar UI
             lblArchivoSeleccionado.setText(archivo.getName());
-            txtResultado.setText(
-                    "✓ Archivo cargado exitosamente\n" +
-                            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                            "Películas: " + cargador.getNumeroFilas() + "\n" +
-                            "Dimensiones: " + cargador.getDimensiones() + "\n" +
-                            "Variables: " + String.join(", ", cargador.getNombresDimensiones())
-            );
+            actualizarTextoResultadoCarga();
 
-            // Habilitar botones
             btnConfigurarPesos.setDisable(false);
             btnSeleccionarVariables.setDisable(false);
             btnEjecutar.setDisable(false);
@@ -146,9 +116,6 @@ public class ControladorPrincipal {
         }
     }
 
-    /**
-     * Maneja el evento de configurar pesos
-     */
     @FXML
     private void onConfigurarPesos() {
         try {
@@ -159,13 +126,10 @@ public class ControladorPrincipal {
             stage.setTitle("Configurar Pesos");
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setScene(scene);
-
-            // --- INICIO DE CAMBIOS ---
             stage.setWidth(450);
             stage.setHeight(600);
             stage.setMinWidth(350);
             stage.setMinHeight(400);
-            // --- FIN DE CAMBIOS ---
 
             ControladorPesos controller = loader.getController();
             controller.inicializarDatos(ponderador.getNombresDimensiones(), ponderador.getPesos());
@@ -184,28 +148,50 @@ public class ControladorPrincipal {
         }
     }
 
-    /**
-     * Maneja el evento de seleccionar variables
-     */
     @FXML
     private void onSeleccionarVariables() {
-        // TODO: Abrir ventana de selección de variables
-        mostrarInformacion("Seleccionar Variables",
-                "Ventana de selección de variables próximamente...\n" +
-                        "Por ahora todas las variables están seleccionadas");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/pantalla-variables.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage stage = new Stage();
+            stage.setTitle("Seleccionar Variables");
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+            stage.setWidth(450);
+            stage.setHeight(600);
+            stage.setMinWidth(350);
+            stage.setMinHeight(400);
+
+            ControladorVariables controller = loader.getController();
+            controller.inicializarDatos(selector.getTodasLasColumnas(), selector.getColumnasSeleccionadas());
+
+            stage.showAndWait();
+
+            if (controller.isGuardado()) {
+                selector.ignorarTodas();
+                selector.seleccionarMultiples(controller.getColumnasSeleccionadas());
+                lblEstado.setText("Selección de variables actualizada.");
+                actualizarTextoResultadoCarga();
+            }
+
+        } catch (IOException e) {
+            mostrarError("Error al abrir selección", e.getMessage());
+            e.printStackTrace();
+        }
     }
 
-    /**
-     * Maneja el evento de ejecutar clustering
-     */
     @FXML
     private void onEjecutar() {
         if (vectores == null) {
             mostrarError("Error", "Primero debe cargar un archivo CSV");
             return;
         }
+        if (!selector.esValido()){
+            mostrarError("Error de selección", "Debe seleccionar al menos una variable para el análisis.");
+            return;
+        }
 
-        // Ejecutar en un hilo separado para no bloquear la UI
         new Thread(() -> {
             try {
                 javafx.application.Platform.runLater(() -> {
@@ -214,28 +200,34 @@ public class ControladorPrincipal {
                     btnEjecutar.setDisable(true);
                 });
 
-                // Aplicar pesos
-                Vector[] vectoresPonderados = ponderador.aplicarPesos(vectores);
+                // 1. Aplicar selección de variables
+                Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
 
-                // Normalizar
+                // 2. Filtrar ponderador para que coincida con las variables seleccionadas
+                Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
+
+                // 3. Aplicar pesos
+                Vector[] vectoresPonderados = ponderadorFiltrado.aplicarPesos(vectoresSeleccionados);
+
+                // 4. Normalizar
                 FactoryNormalizacion.TipoNormalizacion tipoNorm = obtenerTipoNormalizacion();
                 Normalizador normalizador = new Normalizador(tipoNorm);
                 Vector[] vectoresNormalizados = normalizador.normalizar(vectoresPonderados);
 
-                // Calcular matriz de distancias
+                // 5. Calcular matriz de distancias
                 FactoryDistancia.TipoDistancia tipoDist = obtenerTipoDistancia();
                 CalculadorMatrizDistancia calculador = new CalculadorMatrizDistancia();
                 calculador.calcular(vectoresNormalizados, tipoDist);
 
-                // Ejecutar clustering
+                // 6. Ejecutar clustering
                 MotorCluster.TipoEnlace tipoEnlace = obtenerTipoEnlace();
                 MotorCluster motor = new MotorCluster(tipoEnlace);
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
 
-                // Actualizar UI con resultados
                 javafx.application.Platform.runLater(() -> {
                     String resultado = "✓ Clustering completado exitosamente\n" +
                             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                            "Variables usadas: " + selector.getNumeroSeleccionadas() + " de " + selector.getNumeroTotal() + "\n" +
                             "Normalización: " + cmbNormalizacion.getValue() + "\n" +
                             "Distancia: " + cmbDistancia.getValue() + "\n" +
                             "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
@@ -244,7 +236,7 @@ public class ControladorPrincipal {
                             "Fusiones: " + motor.obtenerNumeroFusiones() + "\n" +
                             "\n" +
                             "Dendrograma (primeras líneas):\n" +
-                            dendrogramaRaiz.toStringArbol().substring(0, Math.min(500, dendrogramaRaiz.toStringArbol().length())) + "...";
+                            dendrogramaRaiz.toStringArbol().substring(0, Math.min(1000, dendrogramaRaiz.toStringArbol().length())) + "...";
 
                     txtResultado.setText(resultado);
                     lblEstado.setText("Clustering completado");
@@ -259,14 +251,12 @@ public class ControladorPrincipal {
                     lblEstado.setText("Error en clustering");
                     progressBar.setVisible(false);
                     btnEjecutar.setDisable(false);
+                    e.printStackTrace();
                 });
             }
         }).start();
     }
 
-    /**
-     * Maneja el evento de exportar JSON
-     */
     @FXML
     private void onExportarJSON() {
         if (dendrogramaRaiz == null) {
@@ -285,12 +275,9 @@ public class ControladorPrincipal {
         File archivo = fileChooser.showSaveDialog(stage);
 
         if (archivo != null) {
-            try {
+            try (FileWriter writer = new FileWriter(archivo)) {
                 String json = dendrogramaRaiz.toJSON();
-                FileWriter writer = new FileWriter(archivo);
                 writer.write(json);
-                writer.close();
-
                 mostrarInformacion("Exportación exitosa",
                         "JSON guardado en:\n" + archivo.getAbsolutePath());
                 lblEstado.setText("JSON exportado correctamente");
@@ -300,8 +287,17 @@ public class ControladorPrincipal {
             }
         }
     }
-
-    // Métodos auxiliares
+    
+    private void actualizarTextoResultadoCarga(){
+        txtResultado.setText(
+            "✓ Archivo cargado exitosamente\n" +
+            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+            "Películas: " + cargador.getNumeroFilas() + "\n" +
+            "Dimensiones totales: " + cargador.getDimensiones() + "\n" +
+            "Variables seleccionadas: " + selector.getNumeroSeleccionadas() + "\n" +
+            "Variables a usar: " + String.join(", ", selector.getColumnasSeleccionadas())
+        );
+    }
 
     private FactoryNormalizacion.TipoNormalizacion obtenerTipoNormalizacion() {
         switch (cmbNormalizacion.getValue()) {

@@ -1,5 +1,6 @@
 package modelo.clustering;
 
+import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 
 public class Ponderador {
@@ -35,6 +36,20 @@ public class Ponderador {
         if (nombresDimensiones != null && nombresDimensiones.length == pesos.length) {
             this.nombresDimensiones = nombresDimensiones.clone();
         }
+    }
+
+    public Ponderador filtrarPesos(SelectorColumnas selector) {
+        int[] indicesSeleccionados = selector.getIndicesSeleccionados();
+        double[] nuevosPesos = new double[indicesSeleccionados.length];
+        String[] nuevosNombres = new String[indicesSeleccionados.length];
+
+        for (int i = 0; i < indicesSeleccionados.length; i++) {
+            int indiceOriginal = indicesSeleccionados[i];
+            nuevosPesos[i] = this.pesos[indiceOriginal];
+            nuevosNombres[i] = this.nombresDimensiones[indiceOriginal];
+        }
+
+        return new Ponderador(nuevosPesos, nuevosNombres);
     }
 
     // sin ponderacion, todos = 1.0

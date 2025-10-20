@@ -1,5 +1,7 @@
 package modelo.datos;
 
+import modelo.estructuras.Vector;
+
 import java.util.*;
 
 public class SelectorColumnas {
@@ -23,6 +25,30 @@ public class SelectorColumnas {
             columnasSeleccionadas.add(columnasDisponibles[i]);
             indiceColumnas.put(columnasDisponibles[i], i);
         }
+    }
+
+    public Vector[] aplicarSeleccion(Vector[] vectoresOriginales) {
+        if (vectoresOriginales == null || vectoresOriginales.length == 0) {
+            return new Vector[0];
+        }
+
+        int[] indices = getIndicesSeleccionados();
+        if (indices.length == 0) {
+            return new Vector[0];
+        }
+
+        Vector[] vectoresFiltrados = new Vector[vectoresOriginales.length];
+
+        for (int i = 0; i < vectoresOriginales.length; i++) {
+            double[] datosOriginales = vectoresOriginales[i].getDatos();
+            double[] datosFiltrados = new double[indices.length];
+            for (int j = 0; j < indices.length; j++) {
+                datosFiltrados[j] = datosOriginales[indices[j]];
+            }
+            vectoresFiltrados[i] = new Vector(datosFiltrados, vectoresOriginales[i].getEtiqueta());
+        }
+
+        return vectoresFiltrados;
     }
 
     // solo una y la incluye
