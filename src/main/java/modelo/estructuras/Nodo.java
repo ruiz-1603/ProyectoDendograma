@@ -197,6 +197,17 @@ public class Nodo {
         return elementos.size();
     }
 
+    /**
+     * Retorna la etiqueta del nodo si es una hoja.
+     * @return La etiqueta del elemento, o null si no es una hoja.
+     */
+    public String getEtiqueta() {
+        if (esHoja() && !elementos.isEmpty()) {
+            return elementos.iterator().next();
+        }
+        return null; // O una representación para nodos internos si se desea
+    }
+
     @Override
     public String toString() {
         return obtenerNombre() + " [d=" + String.format("%.2f", distancia) +

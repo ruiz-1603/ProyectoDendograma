@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -18,6 +19,7 @@ import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
 import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
+import vista.DendrogramaDrawer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -32,6 +34,7 @@ public class ControladorPrincipal {
     @FXML private ComboBox<String> cmbDistancia;
     @FXML private ComboBox<String> cmbTipoEnlace;
     @FXML private TextArea txtResultado;
+    @FXML private Pane paneDendrograma;
     @FXML private Button btnCargarCSV;
     @FXML private Button btnConfigurarPesos;
     @FXML private Button btnSeleccionarVariables;
@@ -200,26 +203,18 @@ public class ControladorPrincipal {
                     btnEjecutar.setDisable(true);
                 });
 
-                // 1. Aplicar selección de variables
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
-
-                // 2. Filtrar ponderador para que coincida con las variables seleccionadas
                 Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
-
-                // 3. Aplicar pesos
                 Vector[] vectoresPonderados = ponderadorFiltrado.aplicarPesos(vectoresSeleccionados);
 
-                // 4. Normalizar
                 FactoryNormalizacion.TipoNormalizacion tipoNorm = obtenerTipoNormalizacion();
                 Normalizador normalizador = new Normalizador(tipoNorm);
                 Vector[] vectoresNormalizados = normalizador.normalizar(vectoresPonderados);
 
-                // 5. Calcular matriz de distancias
                 FactoryDistancia.TipoDistancia tipoDist = obtenerTipoDistancia();
                 CalculadorMatrizDistancia calculador = new CalculadorMatrizDistancia();
                 calculador.calcular(vectoresNormalizados, tipoDist);
 
-                // 6. Ejecutar clustering
                 MotorCluster.TipoEnlace tipoEnlace = obtenerTipoEnlace();
                 MotorCluster motor = new MotorCluster(tipoEnlace);
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
@@ -233,12 +228,11 @@ public class ControladorPrincipal {
                             "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
                             "Altura del árbol: " + dendrogramaRaiz.altura() + "\n" +
                             "Hojas: " + dendrogramaRaiz.contarHojas() + "\n" +
-                            "Fusiones: " + motor.obtenerNumeroFusiones() + "\n" +
-                            "\n" +
-                            "Dendrograma (primeras líneas):\n" +
-                            dendrogramaRaiz.toStringArbol().substring(0, Math.min(1000, dendrogramaRaiz.toStringArbol().length())) + "...";
+                            "Fusiones: " + motor.obtenerNumeroFusiones();
 
                     txtResultado.setText(resultado);
+                    DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz);
+
                     lblEstado.setText("Clustering completado");
                     progressBar.setVisible(false);
                     btnEjecutar.setDisable(false);
