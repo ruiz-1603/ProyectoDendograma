@@ -1,6 +1,7 @@
 package modelo;
 
 import modelo.datos.CargadorCSV;
+import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
 import modelo.normalizacion.Normalizador;
@@ -8,7 +9,12 @@ import modelo.normalizacion.FactoryNormalizacion;
 import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
 import modelo.clustering.MotorCluster;
+import modelo.clustering.Ponderador;
 
+/**
+ * Prueba completa del sistema de Dendrograma
+ * Pipeline: CSV → Vectores → Normalización → Distancias → Clustering → Dendrograma → JSON
+ */
 public class PruebaCompleta {
 
     public static void main(String[] args) {
@@ -22,7 +28,7 @@ public class PruebaCompleta {
             System.out.println("PASO 1: Cargando datos desde CSV...");
             System.out.println("─".repeat(70));
             CargadorCSV cargador = new CargadorCSV();
-            cargador.cargar("src/main/resources/movie_dataset.csv"); // Cambiar ruta según tu setup
+            cargador.cargar("ruta/al/archivo.csv"); // Cambiar ruta según tu setup
             cargador.imprimirEstadisticas();
             System.out.println();
 
@@ -31,12 +37,7 @@ public class PruebaCompleta {
             System.out.println("─".repeat(70));
             Vector[] vectoresOriginales = cargador.obtenerVectores();
 
-            // TOMAR SOLO LAS PRIMERAS 100 PELÍCULAS PARA PRUEBA RÁPIDA
-            Vector[] vectoresMuestra = new Vector[Math.min(100, vectoresOriginales.length)];
-            System.arraycopy(vectoresOriginales, 0, vectoresMuestra, 0, vectoresMuestra.length);
-            vectoresOriginales = vectoresMuestra;
-
-            System.out.println("Vectores cargados: " + vectoresOriginales.length + " (primeros 100 para prueba rápida)");
+            System.out.println("Vectores cargados: " + vectoresOriginales.length);
             if (vectoresOriginales.length > 0) {
                 System.out.println("Primeras 3 películas:");
                 for (int i = 0; i < Math.min(3, vectoresOriginales.length); i++) {
@@ -50,9 +51,12 @@ public class PruebaCompleta {
             System.out.println("PASO 3: Normalizando vectores (Min-Max)...");
             System.out.println("─".repeat(70));
             Normalizador normalizador = new Normalizador(FactoryNormalizacion.TipoNormalizacion.MIN_MAX);
-            Vector[] vectoresNormalizados = normalizador.normalizar(vectoresOriginales);
+            Vector[] vectoresNormalizados = normalizador.normalizar(vectoresPonderados);
             System.out.println("✓ " + vectoresNormalizados.length + " vectores normalizados");
             System.out.println();
+
+            // Usar vectoresOriginales para resumen final
+            Vector[] vectoresOriginales = cargador.obtenerVectores();
 
             // PASO 4: Calcular matriz de distancias
             System.out.println("PASO 4: Calculando matriz de distancias (Euclidiana)...");
@@ -86,6 +90,9 @@ public class PruebaCompleta {
             String json = raiz.toJSON();
             System.out.println("JSON (primeros 500 caracteres):");
             System.out.println(json.substring(0, Math.min(500, json.length())) + "...");
+
+            // Guardar JSON a archivo
+            guardarJsonAArchivo(json, "dendrograma.json");
             System.out.println();
 
             // PASO 8: Probar diferentes configuraciones
@@ -105,12 +112,14 @@ public class PruebaCompleta {
             System.out.println("╚════════════════════════════════════════════════════════════════════════╝");
             System.out.println();
             System.out.println("Resumen del pipeline:");
-            System.out.println("  1. CSV → " + vectoresOriginales.length + " películas cargadas");
-            System.out.println("  2. Vectores → " + vectoresNormalizados[0].dimension() + " dimensiones");
-            System.out.println("  3. Normalización → Min-Max aplicado");
-            System.out.println("  4. Distancia → Euclidiana con " + calculador.obtenerNumeroVectores() + " elementos");
-            System.out.println("  5. Clustering → Dendrograma con altura " + raiz.altura());
-            System.out.println("  6. JSON → Exportado y listo para visualizar");
+            System.out.println("  1. CSV → " + cargador.obtenerNumeroFilas() + " películas cargadas");
+            System.out.println("  2. Vectores → " + cargador.obtenerDimensiones() + " dimensiones originales");
+            System.out.println("  3. Selector → " + selector.obtenerNumeroSeleccionadas() + " dimensiones seleccionadas");
+            System.out.println("  4. Ponderación → " + (ponderador.tienePonderacion() ? "Activa" : "Sin ponderación"));
+            System.out.println("  5. Normalización → Min-Max aplicado");
+            System.out.println("  6. Distancia → Euclidiana con " + calculador.obtenerNumeroVectores() + " elementos");
+            System.out.println("  7. Clustering → Dendrograma con altura " + raiz.altura());
+            System.out.println("  8. JSON → Exportado a dendrograma.json");
 
         } catch (Exception e) {
             System.err.println("\n✗ Error durante la prueba:");
@@ -119,8 +128,19 @@ public class PruebaCompleta {
     }
 
     /**
-     * Prueba el sistema con diferentes métricas de distancia
+     * Guarda el JSON a un archivo
      */
+    private static void guardarJsonAArchivo(String json, String nombreArchivo) {
+        try {
+            java.io.File archivo = new java.io.File(nombreArchivo);
+            java.io.FileWriter writer = new java.io.FileWriter(archivo);
+            writer.write(json);
+            writer.close();
+            System.out.println("✓ JSON guardado en: " + archivo.getAbsolutePath());
+        } catch (java.io.IOException e) {
+            System.err.println("✗ Error al guardar JSON: " + e.getMessage());
+        }
+    }
     private static void probarDiferentesDistancias(Vector[] vectores) {
         FactoryDistancia.TipoDistancia[] distancias = {
                 FactoryDistancia.TipoDistancia.EUCLIDIANA,
