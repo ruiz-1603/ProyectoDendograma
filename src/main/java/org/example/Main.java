@@ -10,7 +10,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/vista/pantalla-principal.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/pantalla-principal.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 900, 700);
 
         stage.setTitle("Sistema de Dendrograma y Clustering Jerárquico");
