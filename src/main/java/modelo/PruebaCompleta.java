@@ -11,10 +11,9 @@ import modelo.distancias.FactoryDistancia;
 import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
 
-/**
- * Prueba completa del sistema de Dendrograma
- * Pipeline: CSV → Vectores → Normalización → Distancias → Clustering → Dendrograma → JSON
- */
+
+// PRUEBA DEL DENDROGRAMA
+// Pipeline: CSV → Vectores → Ponderación → Normalización → Distancias → Clustering → Dendrograma → JSON
 public class PruebaCompleta {
 
     public static void main(String[] args) {
@@ -23,20 +22,26 @@ public class PruebaCompleta {
         System.out.println("╚════════════════════════════════════════════════════════════════════════╝");
         System.out.println();
 
+        CargadorCSV cargador = null;
+        SelectorColumnas selector = null;
+        Ponderador ponderador = null;
+        CalculadorMatrizDistancia calculador = null;
+        Nodo raiz = null;
+        MotorCluster motor = null;
+
         try {
             // PASO 1: Cargar CSV
             System.out.println("PASO 1: Cargando datos desde CSV...");
             System.out.println("─".repeat(70));
-            CargadorCSV cargador = new CargadorCSV();
-            cargador.cargar("ruta/al/archivo.csv"); // Cambiar ruta según tu setup
+            cargador = new CargadorCSV();
+            cargador.cargar("src/main/resources/movie_dataset.csv"); // Cambiar ruta según tu setup
             cargador.imprimirEstadisticas();
             System.out.println();
 
             // PASO 2: Obtener vectores
             System.out.println("PASO 2: Convirtiendo a vectores...");
             System.out.println("─".repeat(70));
-            Vector[] vectoresOriginales = cargador.obtenerVectores();
-
+            Vector[] vectoresOriginales = cargador.getVectores();
             System.out.println("Vectores cargados: " + vectoresOriginales.length);
             if (vectoresOriginales.length > 0) {
                 System.out.println("Primeras 3 películas:");
@@ -47,6 +52,37 @@ public class PruebaCompleta {
             }
             System.out.println();
 
+            // PASO 2.5: Selector de columnas
+            System.out.println("PASO 2.5: Configurando selector de columnas...");
+            System.out.println("─".repeat(70));
+            selector = new SelectorColumnas(cargador.getNombresDimensiones());
+            // Ejemplo: ignorar algunas columnas (comentar/descomentar según necesites)
+            // selector.ignorar("genres_conteo");
+            selector.imprimir();
+            System.out.println();
+
+            // PASO 2.6: Aplicar pesos
+            System.out.println("PASO 2.6: Configurando pesos de dimensiones...");
+            System.out.println("─".repeat(70));
+            double[] pesos = new double[cargador.getDimensiones()];
+            for (int i = 0; i < pesos.length; i++) {
+                pesos[i] = 1.0;  // Peso por defecto = 1.0 (sin ponderación)
+            }
+            // Ejemplo: asignar pesos diferentes (comentar/descomentar según necesites)
+            // pesos[0] = 2.0;  // Duplicar peso del budget
+            // pesos[1] = 0.5;  // Reducir peso de popularity
+
+            ponderador = new Ponderador(pesos, cargador.getNombresDimensiones());
+            ponderador.imprimir();
+            System.out.println();
+
+            // PASO 2.7: Aplicando pesos a vectores
+            System.out.println("PASO 2.7: Aplicando pesos a vectores...");
+            System.out.println("─".repeat(70));
+            Vector[] vectoresPonderados = ponderador.aplicarPesos(vectoresOriginales);
+            System.out.println("✓ " + vectoresPonderados.length + " vectores ponderados");
+            System.out.println();
+
             // PASO 3: Normalizar
             System.out.println("PASO 3: Normalizando vectores (Min-Max)...");
             System.out.println("─".repeat(70));
@@ -55,13 +91,10 @@ public class PruebaCompleta {
             System.out.println("✓ " + vectoresNormalizados.length + " vectores normalizados");
             System.out.println();
 
-            // Usar vectoresOriginales para resumen final
-            Vector[] vectoresOriginales = cargador.obtenerVectores();
-
             // PASO 4: Calcular matriz de distancias
             System.out.println("PASO 4: Calculando matriz de distancias (Euclidiana)...");
             System.out.println("─".repeat(70));
-            CalculadorMatrizDistancia calculador = new CalculadorMatrizDistancia();
+            calculador = new CalculadorMatrizDistancia();
             calculador.calcular(vectoresNormalizados, FactoryDistancia.TipoDistancia.EUCLIDIANA);
             calculador.imprimirEstadisticas();
             System.out.println();
@@ -69,8 +102,8 @@ public class PruebaCompleta {
             // PASO 5: Construir dendrograma
             System.out.println("PASO 5: Construyendo dendrograma (Clustering jerárquico)...");
             System.out.println("─".repeat(70));
-            MotorCluster motor = new MotorCluster(MotorCluster.TipoEnlace.PROMEDIO);
-            Nodo raiz = motor.construirDendrograma(vectoresNormalizados,
+            motor = new MotorCluster(MotorCluster.TipoEnlace.PROMEDIO);
+            raiz = motor.construirDendrograma(vectoresNormalizados,
                     FactoryDistancia.TipoDistancia.EUCLIDIANA);
 
             motor.imprimirEstadisticas();
@@ -95,12 +128,13 @@ public class PruebaCompleta {
             guardarJsonAArchivo(json, "dendrograma.json");
             System.out.println();
 
-            // PASO 8: Probar diferentes configuraciones
+            // PASO 8: Probar diferentes distancias
             System.out.println("PASO 8: Probando diferentes distancias...");
             System.out.println("─".repeat(70));
             probarDiferentesDistancias(vectoresNormalizados);
             System.out.println();
 
+            // PASO 9: Probar diferentes tipos de enlace
             System.out.println("PASO 9: Probando diferentes tipos de enlace...");
             System.out.println("─".repeat(70));
             probarDiferentesEnlaces(vectoresNormalizados);
@@ -112,12 +146,12 @@ public class PruebaCompleta {
             System.out.println("╚════════════════════════════════════════════════════════════════════════╝");
             System.out.println();
             System.out.println("Resumen del pipeline:");
-            System.out.println("  1. CSV → " + cargador.obtenerNumeroFilas() + " películas cargadas");
-            System.out.println("  2. Vectores → " + cargador.obtenerDimensiones() + " dimensiones originales");
-            System.out.println("  3. Selector → " + selector.obtenerNumeroSeleccionadas() + " dimensiones seleccionadas");
+            System.out.println("  1. CSV → " + cargador.getNumeroFilas() + " películas cargadas");
+            System.out.println("  2. Vectores → " + cargador.getDimensiones() + " dimensiones originales");
+            System.out.println("  3. Selector → " + selector.getNumeroSeleccionadas() + " dimensiones seleccionadas");
             System.out.println("  4. Ponderación → " + (ponderador.tienePonderacion() ? "Activa" : "Sin ponderación"));
             System.out.println("  5. Normalización → Min-Max aplicado");
-            System.out.println("  6. Distancia → Euclidiana con " + calculador.obtenerNumeroVectores() + " elementos");
+            System.out.println("  6. Distancia → Euclidiana con " + calculador.getNumeroVectores() + " elementos");
             System.out.println("  7. Clustering → Dendrograma con altura " + raiz.altura());
             System.out.println("  8. JSON → Exportado a dendrograma.json");
 
@@ -141,6 +175,10 @@ public class PruebaCompleta {
             System.err.println("✗ Error al guardar JSON: " + e.getMessage());
         }
     }
+
+    /**
+     * Prueba el sistema con diferentes métricas de distancia
+     */
     private static void probarDiferentesDistancias(Vector[] vectores) {
         FactoryDistancia.TipoDistancia[] distancias = {
                 FactoryDistancia.TipoDistancia.EUCLIDIANA,

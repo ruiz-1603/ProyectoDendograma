@@ -10,10 +10,6 @@ public class CalculadorMatrizDistancia {
     private ICalculadorDistancia calculador;
     private String[] etiquetas;
 
-    /**
-     * Constructor
-     * Complejidad: O(1)
-     */
     public CalculadorMatrizDistancia() {
         this.vectores = new Vector[0];
         this.matrizDistancias = null;
@@ -38,11 +34,11 @@ public class CalculadorMatrizDistancia {
         this.calculador = FactoryDistancia.crear(tipoDistancia);
         this.etiquetas = extraerEtiquetas(vectores);
 
-        // Crear matriz cuadrada n x n
+        // crear matriz cuadrada n x n
         int n = vectores.length;
         this.matrizDistancias = new Matriz(n);
 
-        // Calcular distancias
+        // calcular distancias
         for (int i = 0; i < n; i++) {
             // Diagonal: distancia de un elemento consigo mismo = 0
             matrizDistancias.setPosicion(i, i, 0.0);
@@ -60,10 +56,7 @@ public class CalculadorMatrizDistancia {
         return this.matrizDistancias;
     }
 
-    /**
-     * Calcula la matriz usando un nombre de distancia en string
-     * Complejidad: O(n²*m)
-     */
+    // calcular usando distancia pasada por parametro
     public Matriz calcular(Vector[] vectores, String nombreDistancia) {
         FactoryDistancia.TipoDistancia tipo = FactoryDistancia.TipoDistancia.valueOf(
                 nombreDistancia.toUpperCase()
@@ -71,10 +64,6 @@ public class CalculadorMatrizDistancia {
         return calcular(vectores, tipo);
     }
 
-    /**
-     * Extrae etiquetas de los vectores
-     * Complejidad: O(n)
-     */
     private String[] extraerEtiquetas(Vector[] vectores) {
         String[] labels = new String[vectores.length];
         for (int i = 0; i < vectores.length; i++) {
@@ -83,21 +72,14 @@ public class CalculadorMatrizDistancia {
         return labels;
     }
 
-    /**
-     * Obtiene la matriz de distancias
-     * Complejidad: O(1)
-     */
-    public Matriz obtenerMatriz() {
+    public Matriz getMatriz() {
         if (matrizDistancias == null) {
-            throw new IllegalStateException("No hay matriz calculada. Llama a calcular() primero");
+            throw new IllegalStateException("No hay matriz calculada");
         }
         return matrizDistancias;
     }
 
-    /**
-     * Obtiene la distancia entre dos vectores por índice
-     * Complejidad: O(1)
-     */
+    // por indice
     public double obtenerDistancia(int i, int j) {
         if (matrizDistancias == null) {
             throw new IllegalStateException("No hay matriz calculada");
@@ -105,10 +87,7 @@ public class CalculadorMatrizDistancia {
         return matrizDistancias.getPosicion(i, j);
     }
 
-    /**
-     * Obtiene la distancia entre dos vectores por etiqueta
-     * Complejidad: O(n)
-     */
+    // por etiqueta
     public double obtenerDistancia(String etiqueta1, String etiqueta2) {
         int i = obtenerIndiceEtiqueta(etiqueta1);
         int j = obtenerIndiceEtiqueta(etiqueta2);
@@ -120,10 +99,7 @@ public class CalculadorMatrizDistancia {
         return obtenerDistancia(i, j);
     }
 
-    /**
-     * Encuentra el índice de una etiqueta
-     * Complejidad: O(n)
-     */
+    // encuentra el indice de una etiqueta
     private int obtenerIndiceEtiqueta(String etiqueta) {
         for (int i = 0; i < etiquetas.length; i++) {
             if (etiquetas[i].equals(etiqueta)) {
@@ -133,11 +109,7 @@ public class CalculadorMatrizDistancia {
         return -1;
     }
 
-    /**
-     * Obtiene el par con distancia mínima (más cercanos)
-     * Complejidad: O(n²)
-     */
-    public int[] obtenerParMasProximo() {
+    public int[] getParMasProximo() {
         if (matrizDistancias == null) {
             throw new IllegalStateException("No hay matriz calculada");
         }
@@ -159,11 +131,7 @@ public class CalculadorMatrizDistancia {
         return resultado;
     }
 
-    /**
-     * Obtiene el par con distancia máxima (más lejanos)
-     * Complejidad: O(n²)
-     */
-    public int[] obtenerParMasLejano() {
+    public int[] getParMasLejano() {
         if (matrizDistancias == null) {
             throw new IllegalStateException("No hay matriz calculada");
         }
@@ -185,11 +153,7 @@ public class CalculadorMatrizDistancia {
         return resultado;
     }
 
-    /**
-     * Obtiene estadísticas de la matriz
-     * Complejidad: O(n²)
-     */
-    public EstadisticasDistancia obtenerEstadisticas() {
+    public EstadisticasDistancia getEstadisticas() {
         if (matrizDistancias == null) {
             throw new IllegalStateException("No hay matriz calculada");
         }
@@ -211,7 +175,7 @@ public class CalculadorMatrizDistancia {
 
         double promedio = suma / contador;
 
-        // Calcular desviación estándar
+        // calcular desviación estándar
         double sumaCuadrados = 0.0;
         for (int i = 0; i < matrizDistancias.getDimension(); i++) {
             for (int j = i + 1; j < matrizDistancias.getDimension(); j++) {
@@ -225,37 +189,21 @@ public class CalculadorMatrizDistancia {
         return new EstadisticasDistancia(minimo, maximo, promedio, desviacionEstandar);
     }
 
-    /**
-     * Obtiene etiqueta en posición i
-     * Complejidad: O(1)
-     */
-    public String obtenerEtiqueta(int i) {
+    public String getEtiqueta(int i) {
         if (i >= 0 && i < etiquetas.length) {
             return etiquetas[i];
         }
         return "";
     }
 
-    /**
-     * Obtiene todas las etiquetas
-     * Complejidad: O(n)
-     */
-    public String[] obtenerEtiquetas() {
+    public String[] getEtiquetas() {
         return etiquetas.clone();
     }
 
-    /**
-     * Obtiene número de vectores
-     * Complejidad: O(1)
-     */
-    public int obtenerNumeroVectores() {
+    public int getNumeroVectores() {
         return vectores.length;
     }
 
-    /**
-     * Imprime la matriz de distancias
-     * Complejidad: O(n²)
-     */
     public void imprimir() {
         if (matrizDistancias == null) {
             System.out.println("No hay matriz calculada");
@@ -288,17 +236,13 @@ public class CalculadorMatrizDistancia {
         }
     }
 
-    /**
-     * Imprime estadísticas
-     * Complejidad: O(n²)
-     */
     public void imprimirEstadisticas() {
         if (matrizDistancias == null) {
             System.out.println("No hay matriz calculada");
             return;
         }
 
-        EstadisticasDistancia stats = obtenerEstadisticas();
+        EstadisticasDistancia stats = getEstadisticas();
         System.out.println("=== Estadísticas de Distancias ===");
         System.out.println("Mínimo:            " + String.format("%.6f", stats.getMinimo()));
         System.out.println("Máximo:            " + String.format("%.6f", stats.getMaximo()));
@@ -306,9 +250,7 @@ public class CalculadorMatrizDistancia {
         System.out.println("Desv. Estándar:    " + String.format("%.6f", stats.getDesviacionEstandar()));
     }
 
-    /**
-     * Clase interna para almacenar estadísticas
-     */
+    // CLASE INTERNA para almacena distancias
     public static class EstadisticasDistancia {
         private double minimo;
         private double maximo;

@@ -17,12 +17,12 @@ public class DistanciaHamming implements ICalculadorDistancia {
 
         int diferencias = 0;
 
-        // Contar posiciones donde xi ≠ yi
+        // contar posiciones donde xi != yi
         for (int i = 0; i < v1.dimension(); i++) {
             double val1 = v1.getPosicion(i);
             double val2 = v2.getPosicion(i);
 
-            // Comparación con tolerancia para valores de punto flotante
+            // comparacion con tolerancia para valores de punto flotante
             if (Math.abs(val1 - val2) > TOLERANCIA) {
                 diferencias++;
             }
@@ -31,10 +31,6 @@ public class DistanciaHamming implements ICalculadorDistancia {
         return diferencias;
     }
 
-    /**
-     * Versión alternativa para vectores estrictamente binarios
-     * Más eficiente si se sabe que los valores son 0 o 1
-     */
     public double calcularBinario(Vector v1, Vector v2) {
         if (v1.dimension() != v2.dimension()) {
             throw new IllegalArgumentException(
@@ -45,7 +41,7 @@ public class DistanciaHamming implements ICalculadorDistancia {
         int diferencias = 0;
 
         for (int i = 0; i < v1.dimension(); i++) {
-            // Comparación directa para valores binarios
+            // comparación directa para valores binarios
             if (v1.getPosicion(i) != v2.getPosicion(i)) {
                 diferencias++;
             }

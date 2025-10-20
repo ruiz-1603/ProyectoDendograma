@@ -7,16 +7,13 @@ public class Ponderador {
     private double[] pesos;
     private String[] nombresDimensiones;
 
-    /**
-     * Constructor con array de pesos
-     * Complejidad: O(m)
-     */
+    // con pesos
     public Ponderador(double[] pesos) {
         if (pesos == null || pesos.length == 0) {
             throw new IllegalArgumentException("Array de pesos no puede estar vacío");
         }
 
-        // Validar que todos los pesos sean no-negativos
+        // validar que todos los pesos sean no-negativos
         for (double peso : pesos) {
             if (peso < 0) {
                 throw new IllegalArgumentException("Los pesos no pueden ser negativos");
@@ -26,16 +23,12 @@ public class Ponderador {
         this.pesos = pesos.clone();
         this.nombresDimensiones = new String[pesos.length];
 
-        // Nombres por defecto
         for (int i = 0; i < pesos.length; i++) {
             this.nombresDimensiones[i] = "Dimensión_" + i;
         }
     }
 
-    /**
-     * Constructor con pesos y nombres de dimensiones
-     * Complejidad: O(m)
-     */
+    // con pesos y nombres
     public Ponderador(double[] pesos, String[] nombresDimensiones) {
         this(pesos);
 
@@ -44,10 +37,7 @@ public class Ponderador {
         }
     }
 
-    /**
-     * Crea un ponderador con todos los pesos iguales a 1.0 (sin ponderación)
-     * Complejidad: O(m)
-     */
+    // sin ponderacion, todos = 1.0
     public static Ponderador crearSinPesos(int dimension) {
         double[] pesos = new double[dimension];
         for (int i = 0; i < dimension; i++) {
@@ -56,14 +46,6 @@ public class Ponderador {
         return new Ponderador(pesos);
     }
 
-    /**
-     * Aplica pesos a un conjunto de vectores
-     * Cada componente se multiplica por su peso correspondiente
-     *
-     * Fórmula: v'_i = w_i * v_i
-     *
-     * Complejidad: O(n*m)
-     */
     public Vector[] aplicarPesos(Vector[] vectores) {
         if (vectores == null || vectores.length == 0) {
             throw new IllegalArgumentException("Array de vectores no puede estar vacío");
@@ -74,7 +56,7 @@ public class Ponderador {
         for (int v = 0; v < vectores.length; v++) {
             Vector original = vectores[v];
 
-            // Validar dimensión
+            // validar dimension
             if (original.dimension() != pesos.length) {
                 throw new IllegalArgumentException(
                         "Dimensión del vector (" + original.dimension() +
@@ -82,7 +64,7 @@ public class Ponderador {
                 );
             }
 
-            // Crear nuevo vector ponderado
+            // nuevo vector ponderado
             double[] datosPonderados = new double[pesos.length];
 
             for (int i = 0; i < pesos.length; i++) {
@@ -95,10 +77,8 @@ public class Ponderador {
         return resultado;
     }
 
-    /**
-     * Aplica pesos a un único vector
-     * Complejidad: O(m)
-     */
+    // aplicar peso a un solo vector
+    // ver si se usa, si no eliminar
     public Vector aplicarPesos(Vector vector) {
         if (vector == null) {
             throw new IllegalArgumentException("Vector no puede ser null");
@@ -120,10 +100,7 @@ public class Ponderador {
         return new Vector(datosPonderados, vector.getEtiqueta());
     }
 
-    /**
-     * Establece el peso de una dimensión específica
-     * Complejidad: O(1)
-     */
+    // aplicar peso especifico
     public void establecerPeso(int indice, double peso) {
         if (peso < 0) {
             throw new IllegalArgumentException("El peso no puede ser negativo");
@@ -136,55 +113,31 @@ public class Ponderador {
         }
     }
 
-    /**
-     * Obtiene el peso de una dimensión
-     * Complejidad: O(1)
-     */
-    public double obtenerPeso(int indice) {
+    public double getPeso(int indice) {
         if (indice >= 0 && indice < pesos.length) {
             return pesos[indice];
         }
         throw new IndexOutOfBoundsException("Índice fuera de rango: " + indice);
     }
 
-    /**
-     * Establece el nombre de una dimensión
-     * Complejidad: O(1)
-     */
-    public void establecerNombreDimension(int indice, String nombre) {
+    public void setNombreDimension(int indice, String nombre) {
         if (indice >= 0 && indice < nombresDimensiones.length) {
             nombresDimensiones[indice] = nombre;
         }
     }
 
-    /**
-     * Obtiene todos los pesos
-     * Complejidad: O(m)
-     */
-    public double[] obtenerPesos() {
+    public double[] getPesos() {
         return pesos.clone();
     }
 
-    /**
-     * Obtiene todos los nombres de dimensiones
-     * Complejidad: O(m)
-     */
-    public String[] obtenerNombresDimensiones() {
+    public String[] getNombresDimensiones() {
         return nombresDimensiones.clone();
     }
 
-    /**
-     * Obtiene el número de dimensiones
-     * Complejidad: O(1)
-     */
-    public int obtenerDimension() {
+    public int getDimension() {
         return pesos.length;
     }
 
-    /**
-     * Verifica si hay ponderación activa (algún peso != 1.0)
-     * Complejidad: O(m)
-     */
     public boolean tienePonderacion() {
         for (double peso : pesos) {
             if (Math.abs(peso - 1.0) > 1e-9) {
@@ -194,10 +147,7 @@ public class Ponderador {
         return false;
     }
 
-    /**
-     * Normaliza los pesos para que sumen 1.0
-     * Complejidad: O(m)
-     */
+    // normaliza pesos para que sumen 1.0
     public void normalizarPesos() {
         double suma = 0.0;
         for (double peso : pesos) {
@@ -211,10 +161,6 @@ public class Ponderador {
         }
     }
 
-    /**
-     * Imprime información del ponderador
-     * Complejidad: O(m)
-     */
     public void imprimir() {
         System.out.println("=== Ponderador ===");
         System.out.println("Dimensiones: " + pesos.length);

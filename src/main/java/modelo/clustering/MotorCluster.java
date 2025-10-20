@@ -11,10 +11,10 @@ import java.util.*;
 public class MotorCluster {
 
     public enum TipoEnlace {
-        MINIMO,      // Single linkage
-        MAXIMO,      // Complete linkage
-        PROMEDIO,    // Average linkage
-        CENTROIDE    // Centroid linkage
+        MINIMO,      // single linkage
+        MAXIMO,      // complete linkage
+        PROMEDIO,    // average linkage
+        CENTROIDE    // centroid linkage
     }
 
     private Vector[] vectores;
@@ -25,10 +25,7 @@ public class MotorCluster {
     private CalculadorMatrizDistancia calculador;
     private int[] tamanoClusters; // Tamaño de cada cluster para PROMEDIO
 
-    /**
-     * Constructor con tipo de enlace por defecto (PROMEDIO)
-     * Complejidad: O(1)
-     */
+    // por defecto PROMEDIO
     public MotorCluster() {
         this.tipoEnlace = TipoEnlace.PROMEDIO;
         this.clusters = new ArrayList<>();
@@ -37,10 +34,7 @@ public class MotorCluster {
         this.tamanoClusters = new int[0];
     }
 
-    /**
-     * Constructor con tipo de enlace especificado
-     * Complejidad: O(1)
-     */
+    // con tipoEnlace definido por parametro
     public MotorCluster(TipoEnlace tipoEnlace) {
         this.tipoEnlace = tipoEnlace;
         this.clusters = new ArrayList<>();
@@ -135,10 +129,6 @@ public class MotorCluster {
         return construirDendrograma(vectores, tipo);
     }
 
-    /**
-     * Inicializa clusters: cada vector es un cluster individual
-     * Complejidad: O(n)
-     */
     private void inicializarClusters() {
         clusters.clear();
         tamanoClusters = new int[vectores.length];
@@ -149,10 +139,6 @@ public class MotorCluster {
         }
     }
 
-    /**
-     * Encuentra el par de clusters con distancia mínima
-     * Complejidad: O(n²)
-     */
     private int[] encontrarParMasProximo() {
         double minimo = Double.MAX_VALUE;
         int[] resultado = new int[]{-1, -1};
@@ -171,21 +157,15 @@ public class MotorCluster {
         return resultado;
     }
 
-    /**
-     * Actualiza la matriz de distancias usando fórmula Lance-Williams
-     * EN LUGAR de recalcular toda la matriz
-     *
-     * Fórmula: d(nuevo, k) = α*d(i,k) + β*d(j,k) + γ*d(i,j)
-     *
-     * Complejidad: O(n) - solo actualiza n-2 distancias
-     */
+    // actualiza la matriz usando fórmula Lance-Williams
+    // formula: d(nuevo, k) = α*d(i,k) + β*d(j,k) + γ*d(i,j)
     private void actualizarMatrizLanceWilliams(int i, int j, double distanciaIJ) {
         int ni = tamanoClusters[i];
         int nj = tamanoClusters[j];
 
         double alpha_i, alpha_j, gamma;
 
-        // Calcular parámetros según tipo de enlace
+        // calcular parámetros según tipo de enlace
         switch (tipoEnlace) {
             case MINIMO:
                 alpha_i = 0.5;
@@ -211,28 +191,24 @@ public class MotorCluster {
                 throw new IllegalArgumentException("Tipo de enlace no soportado");
         }
 
-        // Actualizar distancias del nuevo cluster con todos los demás
+        // actualizar distancias del nuevo cluster con todos los demas
         for (int k = 0; k < clusters.size(); k++) {
             if (k == i || k == j) continue;
 
             double distanciaIK = matrizDistancias.getPosicion(i, k);
             double distanciaJK = matrizDistancias.getPosicion(j, k);
 
-            // Aplicar fórmula Lance-Williams
+            // aplicar Lance-Williams
             double nuevaDistancia = alpha_i * distanciaIK +
                     alpha_j * distanciaJK +
                     gamma * distanciaIJ;
 
-            // Guardar en posición i (remplazaremos i con nuevo cluster)
+            // remplazar i con nuevo cluster
             matrizDistancias.setPosicion(i, k, nuevaDistancia);
             matrizDistancias.setPosicion(k, i, nuevaDistancia);
         }
     }
 
-    /**
-     * Utilidad: remover un elemento de un array int
-     * Complejidad: O(n)
-     */
     private int[] removerIndice(int[] array, int indice) {
         int[] resultado = new int[array.length - 1];
         int pos = 0;
@@ -244,10 +220,6 @@ public class MotorCluster {
         return resultado;
     }
 
-    /**
-     * Utilidad: agregar un elemento a un array int
-     * Complejidad: O(n)
-     */
     private int[] agregarElemento(int[] array, int elemento) {
         int[] resultado = new int[array.length + 1];
         System.arraycopy(array, 0, resultado, 0, array.length);
@@ -255,42 +227,22 @@ public class MotorCluster {
         return resultado;
     }
 
-    /**
-     * Obtiene lista de distancias de fusión
-     * Complejidad: O(n)
-     */
     public List<Double> obtenerDistanciasFusion() {
         return new ArrayList<>(distanciasFusion);
     }
 
-    /**
-     * Obtiene número de fusiones realizadas
-     * Complejidad: O(1)
-     */
     public int obtenerNumeroFusiones() {
         return distanciasFusion.size();
     }
 
-    /**
-     * Establece el tipo de enlace
-     * Complejidad: O(1)
-     */
     public void setTipoEnlace(TipoEnlace tipo) {
         this.tipoEnlace = tipo;
     }
 
-    /**
-     * Obtiene el tipo de enlace actual
-     * Complejidad: O(1)
-     */
-    public TipoEnlace obtenerTipoEnlace() {
+    public TipoEnlace getTipoEnlace() {
         return tipoEnlace;
     }
 
-    /**
-     * Imprime el dendrograma
-     * Complejidad: O(n)
-     */
     public void imprimirDendrograma(Nodo raiz) {
         System.out.println("=== Dendrograma ===");
         System.out.println("Tipo de enlace: " + tipoEnlace);
@@ -299,10 +251,6 @@ public class MotorCluster {
         System.out.println(raiz.toStringArbol());
     }
 
-    /**
-     * Imprime estadísticas del clustering
-     * Complejidad: O(n)
-     */
     public void imprimirEstadisticas() {
         System.out.println("=== Estadísticas de Clustering ===");
         System.out.println("Vectores iniciales: " + vectores.length);

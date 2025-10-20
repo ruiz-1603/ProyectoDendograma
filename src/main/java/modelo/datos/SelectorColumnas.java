@@ -8,10 +8,7 @@ public class SelectorColumnas {
     private Set<String> columnasSeleccionadas;
     private Map<String, Integer> indiceColumnas;
 
-    /**
-     * Constructor con todas las columnas disponibles
-     * Complejidad: O(m)
-     */
+    // todas las columnas
     public SelectorColumnas(String[] columnasDisponibles) {
         if (columnasDisponibles == null || columnasDisponibles.length == 0) {
             throw new IllegalArgumentException("Array de columnas no puede estar vacío");
@@ -21,17 +18,14 @@ public class SelectorColumnas {
         this.columnasSeleccionadas = new LinkedHashSet<>();
         this.indiceColumnas = new LinkedHashMap<>();
 
-        // Por defecto, todas las columnas están seleccionadas
+        // selecciona todas por defecto
         for (int i = 0; i < columnasDisponibles.length; i++) {
             columnasSeleccionadas.add(columnasDisponibles[i]);
             indiceColumnas.put(columnasDisponibles[i], i);
         }
     }
 
-    /**
-     * Selecciona una columna (la incluye)
-     * Complejidad: O(1)
-     */
+    // solo una y la incluye
     public void seleccionar(String columna) {
         if (!indiceColumnas.containsKey(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
@@ -39,10 +33,7 @@ public class SelectorColumnas {
         columnasSeleccionadas.add(columna);
     }
 
-    /**
-     * Ignora una columna (la excluye)
-     * Complejidad: O(1)
-     */
+    // excluye la columna
     public void ignorar(String columna) {
         if (!indiceColumnas.containsKey(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
@@ -50,10 +41,6 @@ public class SelectorColumnas {
         columnasSeleccionadas.remove(columna);
     }
 
-    /**
-     * Selecciona múltiples columnas
-     * Complejidad: O(m)
-     */
     public void seleccionarMultiples(String[] columnas) {
         if (columnas == null) return;
 
@@ -62,10 +49,6 @@ public class SelectorColumnas {
         }
     }
 
-    /**
-     * Ignora múltiples columnas
-     * Complejidad: O(m)
-     */
     public void ignorarMultiples(String[] columnas) {
         if (columnas == null) return;
 
@@ -74,27 +57,15 @@ public class SelectorColumnas {
         }
     }
 
-    /**
-     * Verifica si una columna está seleccionada
-     * Complejidad: O(1)
-     */
     public boolean estaSeleccionada(String columna) {
         return columnasSeleccionadas.contains(columna);
     }
 
-    /**
-     * Obtiene todas las columnas seleccionadas
-     * Complejidad: O(m)
-     */
-    public String[] obtenerColumnasSeleccionadas() {
+    public String[] getColumnasSeleccionadas() {
         return columnasSeleccionadas.toArray(new String[0]);
     }
 
-    /**
-     * Obtiene todas las columnas ignoradas
-     * Complejidad: O(m)
-     */
-    public String[] obtenerColumnasIgnoradas() {
+    public String[] getColumnasIgnoradas() {
         List<String> ignoradas = new ArrayList<>();
 
         for (String col : todasLasColumnas) {
@@ -106,11 +77,8 @@ public class SelectorColumnas {
         return ignoradas.toArray(new String[0]);
     }
 
-    /**
-     * Obtiene índices de columnas seleccionadas en orden
-     * Complejidad: O(m)
-     */
-    public int[] obtenerIndicesSeleccionados() {
+    // en orden
+    public int[] getIndicesSeleccionados() {
         List<Integer> indices = new ArrayList<>();
 
         for (String col : todasLasColumnas) {
@@ -126,10 +94,6 @@ public class SelectorColumnas {
         return resultado;
     }
 
-    /**
-     * Selecciona todas las columnas
-     * Complejidad: O(m)
-     */
     public void seleccionarTodas() {
         columnasSeleccionadas.clear();
         for (String col : todasLasColumnas) {
@@ -137,63 +101,36 @@ public class SelectorColumnas {
         }
     }
 
-    /**
-     * Ignora todas las columnas
-     * Complejidad: O(1)
-     */
     public void ignorarTodas() {
         columnasSeleccionadas.clear();
     }
 
-    /**
-     * Obtiene número de columnas seleccionadas
-     * Complejidad: O(1)
-     */
-    public int obtenerNumeroSeleccionadas() {
+    public int getNumeroSeleccionadas() {
         return columnasSeleccionadas.size();
     }
 
-    /**
-     * Obtiene número de columnas ignoradas
-     * Complejidad: O(1)
-     */
-    public int obtenerNumeroIgnoradas() {
+    public int getNumeroIgnoradas() {
         return todasLasColumnas.length - columnasSeleccionadas.size();
     }
 
-    /**
-     * Obtiene número total de columnas disponibles
-     * Complejidad: O(1)
-     */
-    public int obtenerNumeroTotal() {
+    public int getNumeroTotal() {
         return todasLasColumnas.length;
     }
 
-    /**
-     * Obtiene todas las columnas disponibles
-     * Complejidad: O(m)
-     */
-    public String[] obtenerTodasLasColumnas() {
+    public String[] getTodasLasColumnas() {
         return todasLasColumnas.clone();
     }
 
-    /**
-     * Valida que haya al menos una columna seleccionada
-     * Complejidad: O(1)
-     */
+    // al menos una seleccionada
     public boolean esValido() {
         return columnasSeleccionadas.size() > 0;
     }
 
-    /**
-     * Imprime el estado del selector
-     * Complejidad: O(m)
-     */
     public void imprimir() {
         System.out.println("=== Selector de Columnas ===");
         System.out.println("Total de columnas: " + todasLasColumnas.length);
         System.out.println("Seleccionadas: " + columnasSeleccionadas.size());
-        System.out.println("Ignoradas: " + obtenerNumeroIgnoradas());
+        System.out.println("Ignoradas: " + getNumeroIgnoradas());
         System.out.println();
 
         System.out.println("COLUMNAS SELECCIONADAS:");
@@ -201,7 +138,7 @@ public class SelectorColumnas {
             System.out.println("  ✓ " + col);
         }
 
-        String[] ignoradas = obtenerColumnasIgnoradas();
+        String[] ignoradas = getColumnasIgnoradas();
         if (ignoradas.length > 0) {
             System.out.println();
             System.out.println("COLUMNAS IGNORADAS:");
@@ -215,6 +152,6 @@ public class SelectorColumnas {
     public String toString() {
         return "SelectorColumnas [total=" + todasLasColumnas.length +
                 ", seleccionadas=" + columnasSeleccionadas.size() +
-                ", ignoradas=" + obtenerNumeroIgnoradas() + "]";
+                ", ignoradas=" + getNumeroIgnoradas() + "]";
     }
 }

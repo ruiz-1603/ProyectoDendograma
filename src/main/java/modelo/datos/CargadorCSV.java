@@ -10,27 +10,23 @@ import java.util.*;
 
 public class CargadorCSV {
 
-    // Columnas numéricas directas
     private static final String[] COLUMNAS_NUMERICAS = {
             "budget", "popularity", "revenue", "runtime", "vote_average", "vote_count"
     };
 
-    // Columnas categóricas simples
     private static final String[] COLUMNAS_CATEGORICAS = {
             "original_language", "status"
     };
 
-    // Columnas de texto/conteo
     private static final String[] COLUMNAS_CONTEO = {
             "genres", "keywords", "cast"
     };
 
-    // Columnas de JSON array (contar elementos)
     private static final String[] COLUMNAS_JSON_ARRAY = {
             "production_companies", "production_countries", "spoken_languages"
     };
 
-    // Columnas de texto a ignorar
+    // director, crew, revisar cuales sí
     private static final String[] COLUMNAS_IGNORAR = {
             "index", "homepage", "id", "original_title", "overview", "tagline", "crew", "director"
     };
@@ -48,16 +44,11 @@ public class CargadorCSV {
     private int indiceIdentificador;
     private int indiceFecha;
 
-    // Mapeo de valores categóricos únicos
     private Map<String, List<String>> categoriasUnicas;
 
-    // Rango de fechas para normalización
     private LocalDate fechaMinima;
     private LocalDate fechaMaxima;
 
-    /**
-     * Constructor
-     */
     public CargadorCSV() {
         this.headers = new String[0];
         this.datos = new ArrayList<>();
@@ -73,9 +64,6 @@ public class CargadorCSV {
         this.fechaMaxima = null;
     }
 
-    /**
-     * Carga un archivo CSV
-     */
     public void cargar(String ruta) throws IOException {
         this.rutaArchivo = ruta;
         this.datos.clear();
@@ -112,7 +100,7 @@ public class CargadorCSV {
             }
         }
 
-        // Procesar datos
+        // procesar datos
         extraerCategoriasUnicas();
         extraerRangoFechas();
 
@@ -127,9 +115,6 @@ public class CargadorCSV {
         System.out.println("  - Total dimensiones: " + totalDimensiones);
     }
 
-    /**
-     * Construye índices de todas las columnas
-     */
     private void construirIndicesColumnas() {
         indicesColumnasNumericas.clear();
         indicesColumnasCategoricas.clear();
@@ -164,9 +149,6 @@ public class CargadorCSV {
         }
     }
 
-    /**
-     * Extrae categorías únicas por columna categórica
-     */
     private void extraerCategoriasUnicas() {
         for (String columna : COLUMNAS_CATEGORICAS) {
             Set<String> unicos = new TreeSet<>();
@@ -186,9 +168,6 @@ public class CargadorCSV {
         }
     }
 
-    /**
-     * Extrae rango de fechas para normalización
-     */
     private void extraerRangoFechas() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<LocalDate> fechas = new ArrayList<>();
@@ -214,9 +193,6 @@ public class CargadorCSV {
         }
     }
 
-    /**
-     * Cuenta elementos en texto separado por espacios o comas
-     */
     private int contarElementos(String texto) {
         if (texto == null || texto.isEmpty() || texto.equals("null")) {
             return 0;
@@ -227,21 +203,15 @@ public class CargadorCSV {
         return elementos.length;
     }
 
-    /**
-     * Cuenta elementos en JSON array (contar elementos dentro de corchetes)
-     */
     private int contarElementosJson(String json) {
         if (json == null || json.isEmpty() || json.equals("null")) {
             return 0;
         }
 
-        // Contar llaves abiertas (cada objeto es un elemento)
+        // contar llaves abiertas (cada objeto es un elemento)
         return json.split("\\{").length - 1;
     }
 
-    /**
-     * Normaliza una fecha a rango [0,1]
-     */
     private double normalizarFecha(String fechaStr) {
         if (fechaStr == null || fechaStr.isEmpty() || fechaStr.equals("null")) {
             return 0.5; // Valor medio si es nula
@@ -264,9 +234,6 @@ public class CargadorCSV {
         }
     }
 
-    /**
-     * Cuenta total de dimensiones one-hot
-     */
     private int contarDimensionesOneHot() {
         int total = 0;
         for (String columna : COLUMNAS_CATEGORICAS) {
@@ -275,9 +242,7 @@ public class CargadorCSV {
         return total;
     }
 
-    /**
-     * Parsea una línea CSV respetando comillas (RFC 4180)
-     */
+    // parsea una línea CSV respetando comillas (RFC 4180)
     private String[] parsearLinea(String linea) {
         List<String> campos = new ArrayList<>();
         StringBuilder campoActual = new StringBuilder();
@@ -308,9 +273,6 @@ public class CargadorCSV {
         return campos.toArray(new String[0]);
     }
 
-    /**
-     * Construye un mapa de una fila
-     */
     private Map<String, String> construirFila(String[] valores) {
         Map<String, String> fila = new LinkedHashMap<>();
 
@@ -325,10 +287,8 @@ public class CargadorCSV {
         return fila;
     }
 
-    /**
-     * Convierte datos a vectores para clustering
-     */
-    public Vector[] obtenerVectores() {
+    // de datos a vectores
+    public Vector[] getVectores() {
         List<Vector> vectores = new ArrayList<>();
 
         for (Map<String, String> fila : datos) {
@@ -339,7 +299,7 @@ public class CargadorCSV {
 
             List<Double> datosVector = new ArrayList<>();
 
-            // 1. Columnas numéricas directas
+            // columnas numericas directas
             for (String columna : COLUMNAS_NUMERICAS) {
                 String valor = fila.get(columna);
                 if (valor == null || valor.isEmpty() || valor.equals("null")) {
@@ -354,7 +314,7 @@ public class CargadorCSV {
                 }
             }
 
-            // 2. Columnas categóricas (one-hot)
+            // columnas categoricas (one-hot)
             for (String columna : COLUMNAS_CATEGORICAS) {
                 String valor = fila.get(columna);
                 if (valor == null || valor.isEmpty() || valor.equals("null")) {
@@ -369,26 +329,26 @@ public class CargadorCSV {
                 }
             }
 
-            // 3. Columnas de conteo (texto)
+            // columnas de conteo (texto)
             for (String columna : COLUMNAS_CONTEO) {
                 String valor = fila.get(columna);
                 int conteo = contarElementos(valor);
                 datosVector.add((double) conteo);
             }
 
-            // 4. Columnas de JSON array
+            // columnas de JSON array
             for (String columna : COLUMNAS_JSON_ARRAY) {
                 String valor = fila.get(columna);
                 int conteo = contarElementosJson(valor);
                 datosVector.add((double) conteo);
             }
 
-            // 5. Columna de fecha (normalizada)
+            // columna de fecha (normalizada)
             String fechaStr = fila.get(COLUMNA_FECHA);
             double fechaNormalizada = normalizarFecha(fechaStr);
             datosVector.add(fechaNormalizada);
 
-            // Crear vector
+            // crear vector
             double[] datos = datosVector.stream().mapToDouble(Double::doubleValue).toArray();
             Vector v = new Vector(datos, identificador);
             vectores.add(v);
@@ -401,18 +361,16 @@ public class CargadorCSV {
         return vectores.toArray(new Vector[0]);
     }
 
-    /**
-     * Obtiene número total de dimensiones
-     */
-    public int obtenerDimensiones() {
+    public int getDimensiones() {
         return COLUMNAS_NUMERICAS.length + contarDimensionesOneHot() +
                 COLUMNAS_CONTEO.length + COLUMNAS_JSON_ARRAY.length + 1;
     }
 
-    /**
-     * Obtiene nombres de todas las dimensiones
-     */
-    public String[] obtenerNombresDimensiones() {
+    public int getNumeroFilas() {
+        return datos.size();
+    }
+
+    public String[] getNombresDimensiones() {
         List<String> nombres = new ArrayList<>();
 
         for (String col : COLUMNAS_NUMERICAS) {
@@ -441,24 +399,18 @@ public class CargadorCSV {
         return nombres.toArray(new String[0]);
     }
 
-    /**
-     * Imprime estadísticas del CSV
-     */
     public void imprimirEstadisticas() {
         System.out.println("=== Estadísticas del CSV ===");
         System.out.println("Archivo: " + rutaArchivo);
         System.out.println("Películas: " + datos.size());
-        System.out.println("Total dimensiones: " + obtenerDimensiones());
+        System.out.println("Total dimensiones: " + getDimensiones());
         System.out.println();
         System.out.println("Rango de fechas: " + fechaMinima + " a " + fechaMaxima);
     }
 
-    /**
-     * Imprime primeras N películas
-     */
     public void imprimirMuestras(int n) {
         System.out.println("=== Primeras " + Math.min(n, datos.size()) + " películas ===");
-        Vector[] vectores = obtenerVectores();
+        Vector[] vectores = getVectores();
 
         for (int i = 0; i < Math.min(n, vectores.length); i++) {
             System.out.println(vectores[i]);
@@ -468,6 +420,6 @@ public class CargadorCSV {
     @Override
     public String toString() {
         return "CargadorCSV [archivo=" + rutaArchivo + ", películas=" + datos.size() +
-                ", dimensiones=" + obtenerDimensiones() + "]";
+                ", dimensiones=" + getDimensiones() + "]";
     }
 }
