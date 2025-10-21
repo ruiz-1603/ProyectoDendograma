@@ -75,8 +75,16 @@ public class DendrogramaDrawer {
         double paneWidth = (leafCounter.get() - 1) * leafSpacing + 2 * PADDING_SIDES;
         calculateInternalX(root, positions);
 
-        double paneHeight = Math.max(600, leafLabelsHeight(leafSpacing));
-        double scaleY = (paneHeight - PADDING_TOP_BOTTOM * 2) / maxDist;
+        List<String> leafLabels = new ArrayList<>();
+        getLeafLabels(root, leafLabels);
+        double longestLabelInChars = leafLabels.stream().mapToInt(String::length).max().orElse(0);
+
+        double labelZoneHeight = longestLabelInChars * FONT_SIZE * 0.7 + 20; // Space for rotated labels
+        double dendrogramZoneHeight = 600; // Fixed height for the tree itself
+        double paneHeight = dendrogramZoneHeight + labelZoneHeight;
+
+        double scaleY = (dendrogramZoneHeight - PADDING_TOP_BOTTOM * 2) / maxDist;
+
         setYPositions(root, positions, scaleY, paneHeight);
 
         pane.setPrefSize(paneWidth, paneHeight);
@@ -113,9 +121,5 @@ public class DendrogramaDrawer {
             setYPositions(node.getIzquierdo(), positions, scaleY, paneHeight);
             setYPositions(node.getDerecho(), positions, scaleY, paneHeight);
         }
-    }
-    
-    private static double leafLabelsHeight(double longestLabelLength) {
-        return longestLabelLength + PADDING_TOP_BOTTOM;
     }
 }
