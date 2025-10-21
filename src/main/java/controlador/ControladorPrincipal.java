@@ -24,6 +24,7 @@ import vista.DendrogramaDrawer;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -215,6 +216,7 @@ public class ControladorPrincipal {
                     progressBar.setVisible(true);
                     btnEjecutar.setDisable(true);
                     txtDistanciaUmbral.setDisable(true);
+                    txtDistanciaUmbral.clear();
                 });
 
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
@@ -247,17 +249,19 @@ public class ControladorPrincipal {
 
                     reportePrincipalCache = resultado.toString(); // Cache the main report
 
+                    List<Nodo> clustersParaColorear = new ArrayList<>();
+
                     if (k > 1 && dendrogramaRaiz != null) {
                         try {
-                            List<Nodo> clusters = dendrogramaRaiz.cortarArbol(k);
-                            resultado.append("\n\n").append(generarReporteClusters(clusters));
+                            clustersParaColorear = dendrogramaRaiz.cortarArbol(k);
+                            resultado.append("\n\n").append(generarReporteClusters(clustersParaColorear));
                         } catch (Exception e) {
                             resultado.append("\n\nError al cortar el árbol: ").append(e.getMessage());
                         }
                     }
 
                     txtResultado.setText(resultado.toString());
-                    DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz);
+                    DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersParaColorear);
 
                     lblEstado.setText("Clustering completado");
                     progressBar.setVisible(false);
@@ -287,7 +291,8 @@ public class ControladorPrincipal {
 
         String umbralStr = txtDistanciaUmbral.getText();
         if (umbralStr == null || umbralStr.isBlank()) {
-            txtResultado.setText(reportePrincipalCache); // Restore main report if field is cleared
+            txtResultado.setText(reportePrincipalCache); // Restore main report
+            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, null); // Redraw with no colors
             return;
         }
 
@@ -301,6 +306,7 @@ public class ControladorPrincipal {
             List<Nodo> clusters = dendrogramaRaiz.cortarPorDistancia(umbral);
             String reporteCorte = generarReporteClusters(clusters);
             txtResultado.setText(reportePrincipalCache + "\n\n" + reporteCorte);
+            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clusters);
 
         } catch (NumberFormatException e) {
             mostrarError("Error de formato", "Por favor, ingrese un número válido para la distancia umbral.");
