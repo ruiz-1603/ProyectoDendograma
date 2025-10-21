@@ -1,7 +1,13 @@
 package modelo.estructuras;
 
-import java.util.*;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Nodo de árbol binario para dendrograma
@@ -212,5 +218,71 @@ public class Nodo {
     public String toString() {
         return obtenerNombre() + " [d=" + String.format("%.2f", distancia) +
                 ", hojas=" + contarHojas() + "]";
+    }
+
+    /**
+     * Corta el dendrograma para obtener un número k de clusters.
+     * @param k El número de clusters deseado.
+     * @return Una lista de Nodos que representan los k clusters.
+     */
+    public List<Nodo> cortarArbol(int k) {
+        if (k < 1) {
+            throw new IllegalArgumentException("K debe ser al menos 1.");
+        }
+        if (k > contarHojas()) {
+            throw new IllegalArgumentException("K no puede ser mayor que el número de elementos.");
+        }
+        if (k == 1) {
+            return Collections.singletonList(this);
+        }
+
+        // PriorityQueue para encontrar siempre el siguiente cluster a dividir (el de mayor distancia)
+        PriorityQueue<Nodo> aDividir = new PriorityQueue<>(Comparator.comparingDouble(Nodo::getDistancia).reversed());
+        aDividir.add(this);
+
+        while (aDividir.size() < k) {
+            Nodo masGrande = aDividir.poll();
+
+            if (masGrande == null || masGrande.esHoja()) {
+                // No se puede dividir más, hemos alcanzado el número máximo de clusters posibles
+                break;
+            }
+
+            aDividir.add(masGrande.getIzquierdo());
+            aDividir.add(masGrande.getDerecho());
+        }
+
+        return new ArrayList<>(aDividir);
+    }
+
+    /**
+     * Corta el dendrograma según un umbral de distancia.
+     * @param umbral La distancia máxima de fusión para considerar un subárbol como un clúster.
+     * @return Una lista de Nodos que representan los clusters.
+     */
+    public List<Nodo> cortarPorDistancia(double umbral) {
+        // Wrapper para el método recursivo.
+        List<Nodo> clusters = new ArrayList<>();
+        cortarPorDistanciaRecursivo(umbral, clusters);
+        return clusters;
+    }
+
+    private void cortarPorDistanciaRecursivo(double umbral, List<Nodo> clusters) {
+        // Si la distancia de fusión de este nodo es mayor que el umbral,
+        // significa que la fusión no debería haber ocurrido.
+        // Por lo tanto, descendemos a sus hijos.
+        // Las hojas tienen distancia 0, por lo que nunca cumplirán esta condición.
+        if (this.distancia > umbral && !this.esHoja()) {
+            if (izquierdo != null) {
+                izquierdo.cortarPorDistanciaRecursivo(umbral, clusters);
+            }
+            if (derecho != null) {
+                derecho.cortarPorDistanciaRecursivo(umbral, clusters);
+            }
+        } else {
+            // Si la distancia de este nodo es <= al umbral, esta fusión es válida.
+            // Este nodo y todo su subárbol se consideran un único clúster.
+            clusters.add(this);
+        }
     }
 }

@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class ControladorPrincipal {
 
@@ -33,6 +35,8 @@ public class ControladorPrincipal {
     @FXML private ComboBox<String> cmbNormalizacion;
     @FXML private ComboBox<String> cmbDistancia;
     @FXML private ComboBox<String> cmbTipoEnlace;
+    @FXML private Spinner<Integer> spinnerClusters;
+    @FXML private TextField txtDistanciaUmbral;
     @FXML private TextArea txtResultado;
     @FXML private Pane paneDendrograma;
     @FXML private Button btnCargarCSV;
@@ -50,6 +54,7 @@ public class ControladorPrincipal {
     private Vector[] vectores;
     private Nodo dendrogramaRaiz;
     private File archivoCSV;
+    private String reportePrincipalCache = ""; // Cache for the main report
 
     @FXML
     public void initialize() {
@@ -61,6 +66,10 @@ public class ControladorPrincipal {
 
         cmbTipoEnlace.getItems().addAll("Promedio", "Mínimo", "Máximo", "Centroide");
         cmbTipoEnlace.setValue("Promedio");
+
+        spinnerClusters.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1, 1));
+        spinnerClusters.setDisable(true);
+        txtDistanciaUmbral.setDisable(true);
 
         btnConfigurarPesos.setDisable(true);
         btnSeleccionarVariables.setDisable(true);
@@ -109,6 +118,8 @@ public class ControladorPrincipal {
             btnConfigurarPesos.setDisable(false);
             btnSeleccionarVariables.setDisable(false);
             btnEjecutar.setDisable(false);
+            spinnerClusters.setDisable(false);
+            spinnerClusters.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, vectores.length, 1));
 
             lblEstado.setText("Listo para ejecutar clustering");
             progressBar.setVisible(false);
@@ -195,12 +206,15 @@ public class ControladorPrincipal {
             return;
         }
 
+        final int k = spinnerClusters.getValue();
+
         new Thread(() -> {
             try {
                 javafx.application.Platform.runLater(() -> {
                     lblEstado.setText("Ejecutando clustering...");
                     progressBar.setVisible(true);
                     btnEjecutar.setDisable(true);
+                    txtDistanciaUmbral.setDisable(true);
                 });
 
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
@@ -220,7 +234,7 @@ public class ControladorPrincipal {
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
 
                 javafx.application.Platform.runLater(() -> {
-                    String resultado = "✓ Clustering completado exitosamente\n" +
+                    StringBuilder resultado = new StringBuilder("✓ Clustering completado exitosamente\n" +
                             "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
                             "Variables usadas: " + selector.getNumeroSeleccionadas() + " de " + selector.getNumeroTotal() + "\n" +
                             "Normalización: " + cmbNormalizacion.getValue() + "\n" +
@@ -228,15 +242,28 @@ public class ControladorPrincipal {
                             "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
                             "Altura del árbol: " + dendrogramaRaiz.altura() + "\n" +
                             "Hojas: " + dendrogramaRaiz.contarHojas() + "\n" +
-                            "Fusiones: " + motor.obtenerNumeroFusiones();
+                            "Distancia máx. de fusión: " + String.format("%.4f", dendrogramaRaiz.getDistancia()) + "\n" +
+                            "Fusiones: " + motor.obtenerNumeroFusiones());
 
-                    txtResultado.setText(resultado);
+                    reportePrincipalCache = resultado.toString(); // Cache the main report
+
+                    if (k > 1 && dendrogramaRaiz != null) {
+                        try {
+                            List<Nodo> clusters = dendrogramaRaiz.cortarArbol(k);
+                            resultado.append("\n\n").append(generarReporteClusters(clusters));
+                        } catch (Exception e) {
+                            resultado.append("\n\nError al cortar el árbol: ").append(e.getMessage());
+                        }
+                    }
+
+                    txtResultado.setText(resultado.toString());
                     DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz);
 
                     lblEstado.setText("Clustering completado");
                     progressBar.setVisible(false);
                     btnEjecutar.setDisable(false);
                     btnExportarJSON.setDisable(false);
+                    txtDistanciaUmbral.setDisable(false);
                 });
 
             } catch (Exception e) {
@@ -249,6 +276,51 @@ public class ControladorPrincipal {
                 });
             }
         }).start();
+    }
+
+    @FXML
+    public void onAplicarCorteDistancia() {
+        if (dendrogramaRaiz == null) {
+            mostrarError("Error", "Primero debe ejecutar el clustering para poder cortar por distancia.");
+            return;
+        }
+
+        String umbralStr = txtDistanciaUmbral.getText();
+        if (umbralStr == null || umbralStr.isBlank()) {
+            txtResultado.setText(reportePrincipalCache); // Restore main report if field is cleared
+            return;
+        }
+
+        try {
+            double umbral = Double.parseDouble(umbralStr.replace(',', '.'));
+            if (umbral < 0) {
+                mostrarError("Error de validación", "La distancia umbral no puede ser negativa.");
+                return;
+            }
+
+            List<Nodo> clusters = dendrogramaRaiz.cortarPorDistancia(umbral);
+            String reporteCorte = generarReporteClusters(clusters);
+            txtResultado.setText(reportePrincipalCache + "\n\n" + reporteCorte);
+
+        } catch (NumberFormatException e) {
+            mostrarError("Error de formato", "Por favor, ingrese un número válido para la distancia umbral.");
+        } catch (Exception e) {
+            mostrarError("Error al cortar", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private String generarReporteClusters(List<Nodo> clusters) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Resultado del Corte en ").append(clusters.size()).append(" Clusters\n");
+        sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+        for (int i = 0; i < clusters.size(); i++) {
+            Nodo cluster = clusters.get(i);
+            sb.append("Cluster ").append(i + 1).append(" (").append(cluster.contarHojas()).append(" miembros):\n");
+            List<String> etiquetas = cluster.obtenerEtiquetasHojas();
+            sb.append("  ").append(etiquetas.stream().collect(Collectors.joining(", "))).append("\n\n");
+        }
+        return sb.toString();
     }
 
     @FXML

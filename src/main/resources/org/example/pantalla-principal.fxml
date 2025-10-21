@@ -54,6 +54,14 @@
                             <ComboBox fx:id="cmbDistancia" prefWidth="200" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
                             <Label text="Tipo de Enlace:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                             <ComboBox fx:id="cmbTipoEnlace" prefWidth="200" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                            <!-- Número de Clusters -->
+                            <Label text="Número de Clusters (k):" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                            <Spinner fx:id="spinnerClusters" prefWidth="100" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+                            <!-- Distancia Umbral -->
+                            <Label text="Distancia Umbral:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                            <TextField fx:id="txtDistanciaUmbral" prefWidth="100" onAction="#onAplicarCorteDistancia" promptText="Ej: 1.25" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
                         </GridPane>
                         <Separator/>
                         <HBox spacing="10">
