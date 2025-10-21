@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controlador.ControladorPesos"
+      spacing="15"
+      style="-fx-background-color: #f5f5f5; -fx-padding: 20;">
+
+    <HBox alignment="CENTER" style="-fx-background-color: #FF9800; -fx-padding: 15; -fx-margin-bottom: 10;">
+        <Label text="Configuración de Pesos de Variables"
+               textFill="WHITE"
+               style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+    </HBox>
+
+    <Label text="Asigne un peso a cada variable. Un valor mayor le da más importancia a la variable en el cálculo de la distancia. Use 1.0 para no aplicar ponderación."
+           wrapText="true"
+           style="-fx-font-size: 13px;"/>
+
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+        <GridPane fx:id="gridPesos" hgap="10" vgap="8">
+            <padding>
+                <Insets top="10" right="10" bottom="10" left="10"/>
+            </padding>
+            <columnConstraints>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="60.0"/>
+                <ColumnConstraints hgrow="ALWAYS" percentWidth="40.0"/>
+            </columnConstraints>
+        </GridPane>
+    </ScrollPane>
+
+    <Separator/>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button fx:id="btnGuardar"
+                text="Guardar"
+                onAction="#onGuardar"
+                style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;"/>
+        <Button fx:id="btnCancelar"
+                text="Cancelar"
+                onAction="#onCancelar"
+                style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 14px;"/>
+    </HBox>
+</VBox>

@@ -1,6 +1,6 @@
 package modelo.distancias;
 
-import modelo.estructuras.*;
+import modelo.estructuras.Vector;
 
 public class DistanciaEuclidiana implements ICalculadorDistancia {
 
@@ -15,13 +15,12 @@ public class DistanciaEuclidiana implements ICalculadorDistancia {
 
         double suma = 0.0;
 
-        // Σ(xi - yi)²
+        // Σ(xi - yi)^2
         for (int i = 0; i < v1.dimension(); i++) {
             double diferencia = v1.getPosicion(i) - v2.getPosicion(i);
             suma += diferencia * diferencia;
         }
 
-        // √(suma)
         return Math.sqrt(suma);
     }
 
