@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Text?>
+
+<Pane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="controlador.ControladorPrincipal">
+   <children>
+      <Text layoutX="33.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sistema de Dendrograma y Clustering Jerárquico" />
+
+      <Label layoutX="33.0" layoutY="70.0" text="1. Cargar Datos" />
+      <Button fx:id="btnCargarCSV" layoutX="44.0" layoutY="90.0" mnemonicParsing="false" text="Cargar archivo" onAction="#onCargarCSV" />
+      <Label fx:id="lblArchivoSeleccionado" layoutX="150.0" layoutY="94.0" text="Ningún archivo seleccionado" />
+
+      <Label layoutX="33.0" layoutY="140.0" text="2. Configuración del Clustering" />
+      <Label layoutX="33.0" layoutY="170.0" text="Normalización:" />
+      <ComboBox fx:id="cmbNormalizacion" layoutX="123.0" layoutY="166.0" prefHeight="25.0" prefWidth="127.0" />
+      <Label layoutX="38.0" layoutY="200.0" text="Funciones:" />
+      <ComboBox fx:id="cmbDistancia" layoutX="117.0" layoutY="196.0" prefHeight="25.0" prefWidth="133.0" />
+      <Label layoutX="36.0" layoutY="230.0" text="Tipo de enlace:" />
+      <ComboBox fx:id="cmbTipoEnlace" layoutX="134.0" layoutY="226.0" prefHeight="25.0" prefWidth="119.0" />
+      <Label layoutX="43.0" layoutY="260.0" text="Número de clusters:" />
+      <Spinner fx:id="spinnerClusters" layoutX="163.0" layoutY="256.0" prefHeight="25.0" prefWidth="58.0" />
+      <Label layoutX="45.0" layoutY="290.0" text="Distancia de umbral:" />
+      <TextField fx:id="txtDistanciaUmbral" layoutX="175.0" layoutY="286.0" prefHeight="25.0" prefWidth="69.0" onAction="#onAplicarCorteDistancia" promptText="Ej: 1.25" />
+
+      <Button fx:id="btnConfigurarPesos" layoutX="39.0" layoutY="330.0" mnemonicParsing="false" text="Configurar pesos" onAction="#onConfigurarPesos" />
+      <Button fx:id="btnSeleccionarVariables" layoutX="168.0" layoutY="330.0" mnemonicParsing="false" text="Seleccionar variables" onAction="#onSeleccionarVariables" />
+
+      <Label layoutX="33.0" layoutY="380.0" text="3. Ejecutar Clustering" />
+      <Button fx:id="btnEjecutar" layoutX="47.0" layoutY="400.0" mnemonicParsing="false" text="Ejecutar" onAction="#onEjecutar" />
+      <Button fx:id="btnExportarJSON" layoutX="120.0" layoutY="400.0" mnemonicParsing="false" text="Exportar JSON" onAction="#onExportarJSON" />
+      <ProgressBar fx:id="progressBar" layoutX="33.0" layoutY="440.0" prefWidth="220.0" progress="0.0" />
+      <Label fx:id="lblEstado" layoutX="33.0" layoutY="460.0" text="Estado: Listo" />
+
+      <Label layoutX="324.0" layoutY="30.0" text="4. Resultados" />
+      <TabPane fx:id="tabPaneResultados" layoutX="324.0" layoutY="50.0" prefHeight="560.0" prefWidth="690.0" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Gráfico Dendrograma">
+            <content>
+              <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <Pane fx:id="paneDendrograma" prefHeight="520.0" prefWidth="680.0" />
+                     </content>
+              </ScrollPane>
+            </content>
+          </Tab>
+          <Tab text="Resultado en Texto">
+            <content>
+              <TextArea fx:id="txtResultado" editable="false" wrapText="true" prefHeight="520.0" prefWidth="680.0" />
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</Pane>
