@@ -1,12 +1,19 @@
 package modelo.datos;
 
+import modelo.estructuras.Diccionario;
+import modelo.estructuras.IDiccionario;
 import modelo.estructuras.Vector;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 
 public class CargadorCSV {
 
@@ -35,16 +42,16 @@ public class CargadorCSV {
     private static final String COLUMNA_FECHA = "release_date";
 
     private String[] headers;
-    private List<Map<String, String>> datos;
+    private List<IDiccionario<String, String>> datos;
     private String rutaArchivo;
-    private Map<String, Integer> indicesColumnasNumericas;
-    private Map<String, Integer> indicesColumnasCategoricas;
-    private Map<String, Integer> indicesColumnasConteo;
-    private Map<String, Integer> indicesColumnasJsonArray;
+    private IDiccionario<String, Integer> indicesColumnasNumericas;
+    private IDiccionario<String, Integer> indicesColumnasCategoricas;
+    private IDiccionario<String, Integer> indicesColumnasConteo;
+    private IDiccionario<String, Integer> indicesColumnasJsonArray;
     private int indiceIdentificador;
     private int indiceFecha;
 
-    private Map<String, List<String>> categoriasUnicas;
+    private IDiccionario<String, List<String>> categoriasUnicas;
 
     private LocalDate fechaMinima;
     private LocalDate fechaMaxima;
@@ -53,11 +60,11 @@ public class CargadorCSV {
         this.headers = new String[0];
         this.datos = new ArrayList<>();
         this.rutaArchivo = "";
-        this.indicesColumnasNumericas = new HashMap<>();
-        this.indicesColumnasCategoricas = new HashMap<>();
-        this.indicesColumnasConteo = new HashMap<>();
-        this.indicesColumnasJsonArray = new HashMap<>();
-        this.categoriasUnicas = new HashMap<>();
+        this.indicesColumnasNumericas = new Diccionario<>();
+        this.indicesColumnasCategoricas = new Diccionario<>();
+        this.indicesColumnasConteo = new Diccionario<>();
+        this.indicesColumnasJsonArray = new Diccionario<>();
+        this.categoriasUnicas = new Diccionario<>();
         this.indiceIdentificador = -1;
         this.indiceFecha = -1;
         this.fechaMinima = null;
@@ -67,7 +74,7 @@ public class CargadorCSV {
     public void cargar(String ruta) throws IOException {
         this.rutaArchivo = ruta;
         this.datos.clear();
-        this.categoriasUnicas.clear();
+        this.categoriasUnicas.limpiar();
 
         try (BufferedReader reader = new BufferedReader(
                 new InputStreamReader(new FileInputStream(ruta), StandardCharsets.UTF_8))) {
@@ -91,7 +98,7 @@ public class CargadorCSV {
 
                 try {
                     String[] valores = parsearLinea(linea);
-                    Map<String, String> fila = construirFila(valores);
+                    IDiccionario<String, String> fila = construirFila(valores);
                     datos.add(fila);
                 } catch (Exception e) {
                     System.err.println("Advertencia línea " + numeroLinea + ": " + e.getMessage());
@@ -116,10 +123,10 @@ public class CargadorCSV {
     }
 
     private void construirIndicesColumnas() {
-        indicesColumnasNumericas.clear();
-        indicesColumnasCategoricas.clear();
-        indicesColumnasConteo.clear();
-        indicesColumnasJsonArray.clear();
+        indicesColumnasNumericas.limpiar();
+        indicesColumnasCategoricas.limpiar();
+        indicesColumnasConteo.limpiar();
+        indicesColumnasJsonArray.limpiar();
 
         for (int i = 0; i < headers.length; i++) {
             String header = headers[i].trim();
@@ -132,19 +139,19 @@ public class CargadorCSV {
             }
 
             for (String col : COLUMNAS_NUMERICAS) {
-                if (header.equals(col)) indicesColumnasNumericas.put(col, i);
+                if (header.equals(col)) indicesColumnasNumericas.poner(col, i);
             }
 
             for (String col : COLUMNAS_CATEGORICAS) {
-                if (header.equals(col)) indicesColumnasCategoricas.put(col, i);
+                if (header.equals(col)) indicesColumnasCategoricas.poner(col, i);
             }
 
             for (String col : COLUMNAS_CONTEO) {
-                if (header.equals(col)) indicesColumnasConteo.put(col, i);
+                if (header.equals(col)) indicesColumnasConteo.poner(col, i);
             }
 
             for (String col : COLUMNAS_JSON_ARRAY) {
-                if (header.equals(col)) indicesColumnasJsonArray.put(col, i);
+                if (header.equals(col)) indicesColumnasJsonArray.poner(col, i);
             }
         }
     }
@@ -153,8 +160,8 @@ public class CargadorCSV {
         for (String columna : COLUMNAS_CATEGORICAS) {
             Set<String> unicos = new TreeSet<>();
 
-            for (Map<String, String> fila : datos) {
-                String valor = fila.get(columna);
+            for (IDiccionario<String, String> fila : datos) {
+                String valor = fila.obtener(columna);
                 if (valor != null && !valor.isEmpty() && !valor.equals("null")) {
                     unicos.add(valor.trim());
                 }
@@ -164,7 +171,7 @@ public class CargadorCSV {
                 unicos.add("desconocido");
             }
 
-            categoriasUnicas.put(columna, new ArrayList<>(unicos));
+            categoriasUnicas.poner(columna, new ArrayList<>(unicos));
         }
     }
 
@@ -172,8 +179,8 @@ public class CargadorCSV {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         List<LocalDate> fechas = new ArrayList<>();
 
-        for (Map<String, String> fila : datos) {
-            String fechaStr = fila.get(COLUMNA_FECHA);
+        for (IDiccionario<String, String> fila : datos) {
+            String fechaStr = fila.obtener(COLUMNA_FECHA);
             if (fechaStr != null && !fechaStr.isEmpty() && !fechaStr.equals("null")) {
                 try {
                     LocalDate fecha = LocalDate.parse(fechaStr.trim(), formatter);
@@ -237,7 +244,11 @@ public class CargadorCSV {
     private int contarDimensionesOneHot() {
         int total = 0;
         for (String columna : COLUMNAS_CATEGORICAS) {
-            total += categoriasUnicas.getOrDefault(columna, new ArrayList<>()).size();
+            List<String> categorias = categoriasUnicas.obtener(columna);
+            if (categorias == null) {
+                categorias = new ArrayList<>();
+            }
+            total += categorias.size();
         }
         return total;
     }
@@ -273,15 +284,15 @@ public class CargadorCSV {
         return campos.toArray(new String[0]);
     }
 
-    private Map<String, String> construirFila(String[] valores) {
-        Map<String, String> fila = new LinkedHashMap<>();
+    private IDiccionario<String, String> construirFila(String[] valores) {
+        IDiccionario<String, String> fila = new Diccionario<>();
 
         for (int i = 0; i < headers.length && i < valores.length; i++) {
-            fila.put(headers[i].trim(), valores[i].trim());
+            fila.poner(headers[i].trim(), valores[i].trim());
         }
 
         for (int i = valores.length; i < headers.length; i++) {
-            fila.put(headers[i].trim(), "");
+            fila.poner(headers[i].trim(), "");
         }
 
         return fila;
@@ -291,8 +302,8 @@ public class CargadorCSV {
     public Vector[] getVectores() {
         List<Vector> vectores = new ArrayList<>();
 
-        for (Map<String, String> fila : datos) {
-            String identificador = fila.get(COLUMNA_IDENTIFICADOR);
+        for (IDiccionario<String, String> fila : datos) {
+            String identificador = fila.obtener(COLUMNA_IDENTIFICADOR);
             if (identificador == null || identificador.isEmpty()) {
                 continue;
             }
@@ -301,7 +312,7 @@ public class CargadorCSV {
 
             // columnas numericas directas
             for (String columna : COLUMNAS_NUMERICAS) {
-                String valor = fila.get(columna);
+                String valor = fila.obtener(columna);
                 if (valor == null || valor.isEmpty() || valor.equals("null")) {
                     datosVector.add(0.0);
                 } else {
@@ -316,12 +327,12 @@ public class CargadorCSV {
 
             // columnas categoricas (one-hot)
             for (String columna : COLUMNAS_CATEGORICAS) {
-                String valor = fila.get(columna);
+                String valor = fila.obtener(columna);
                 if (valor == null || valor.isEmpty() || valor.equals("null")) {
                     valor = "desconocido";
                 }
 
-                List<String> categorias = categoriasUnicas.get(columna);
+                List<String> categorias = categoriasUnicas.obtener(columna);
                 if (categorias != null) {
                     for (String categoria : categorias) {
                         datosVector.add(valor.equals(categoria) ? 1.0 : 0.0);
@@ -331,20 +342,20 @@ public class CargadorCSV {
 
             // columnas de conteo (texto)
             for (String columna : COLUMNAS_CONTEO) {
-                String valor = fila.get(columna);
+                String valor = fila.obtener(columna);
                 int conteo = contarElementos(valor);
                 datosVector.add((double) conteo);
             }
 
             // columnas de JSON array
             for (String columna : COLUMNAS_JSON_ARRAY) {
-                String valor = fila.get(columna);
+                String valor = fila.obtener(columna);
                 int conteo = contarElementosJson(valor);
                 datosVector.add((double) conteo);
             }
 
             // columna de fecha (normalizada)
-            String fechaStr = fila.get(COLUMNA_FECHA);
+            String fechaStr = fila.obtener(COLUMNA_FECHA);
             double fechaNormalizada = normalizarFecha(fechaStr);
             datosVector.add(fechaNormalizada);
 
@@ -378,7 +389,7 @@ public class CargadorCSV {
         }
 
         for (String columna : COLUMNAS_CATEGORICAS) {
-            List<String> categorias = categoriasUnicas.get(columna);
+            List<String> categorias = categoriasUnicas.obtener(columna);
             if (categorias != null) {
                 for (String cat : categorias) {
                     nombres.add(columna + "_" + cat);

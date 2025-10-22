@@ -1,14 +1,19 @@
 package modelo.datos;
 
+import modelo.estructuras.Diccionario;
+import modelo.estructuras.IDiccionario;
 import modelo.estructuras.Vector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class SelectorColumnas {
 
     private String[] todasLasColumnas;
     private Set<String> columnasSeleccionadas;
-    private Map<String, Integer> indiceColumnas;
+    private IDiccionario<String, Integer> indiceColumnas;
 
     // todas las columnas
     public SelectorColumnas(String[] columnasDisponibles) {
@@ -18,12 +23,12 @@ public class SelectorColumnas {
 
         this.todasLasColumnas = columnasDisponibles.clone();
         this.columnasSeleccionadas = new LinkedHashSet<>();
-        this.indiceColumnas = new LinkedHashMap<>();
+        this.indiceColumnas = new Diccionario<>();
 
         // selecciona todas por defecto
         for (int i = 0; i < columnasDisponibles.length; i++) {
             columnasSeleccionadas.add(columnasDisponibles[i]);
-            indiceColumnas.put(columnasDisponibles[i], i);
+            indiceColumnas.poner(columnasDisponibles[i], i);
         }
     }
 
@@ -53,7 +58,7 @@ public class SelectorColumnas {
 
     // solo una y la incluye
     public void seleccionar(String columna) {
-        if (!indiceColumnas.containsKey(columna)) {
+        if (!indiceColumnas.contieneClave(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
         }
         columnasSeleccionadas.add(columna);
@@ -61,7 +66,7 @@ public class SelectorColumnas {
 
     // excluye la columna
     public void ignorar(String columna) {
-        if (!indiceColumnas.containsKey(columna)) {
+        if (!indiceColumnas.contieneClave(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
         }
         columnasSeleccionadas.remove(columna);
@@ -109,7 +114,7 @@ public class SelectorColumnas {
 
         for (String col : todasLasColumnas) {
             if (columnasSeleccionadas.contains(col)) {
-                indices.add(indiceColumnas.get(col));
+                indices.add(indiceColumnas.obtener(col));
             }
         }
 
