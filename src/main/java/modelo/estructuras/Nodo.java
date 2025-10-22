@@ -236,7 +236,7 @@ public class Nodo {
             return Collections.singletonList(this);
         }
 
-        // PriorityQueue para encontrar siempre el siguiente cluster a dividir (el de mayor distancia)
+        // No se puede usar esta Priority
         PriorityQueue<Nodo> aDividir = new PriorityQueue<>(Comparator.comparingDouble(Nodo::getDistancia).reversed());
         aDividir.add(this);
 
