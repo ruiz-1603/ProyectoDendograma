@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import modelo.estructuras.ListaDoble;
 import modelo.estructuras.Nodo;
 
 import java.util.ArrayList;
@@ -79,7 +80,11 @@ public class DendrogramaDrawer {
 
     private static void getLeafLabels(Nodo node, List<String> labels) {
         if (node.esHoja()) {
-            labels.add(node.getEtiqueta());
+            // Una hoja puede tener uno o más elementos
+            ListaDoble.IteradorLista<String> it = node.getElementos().iterador();
+            while (it.tieneSiguiente()) {
+                labels.add(it.siguiente());
+            }
             return;
         }
         getLeafLabels(node.getIzquierdo(), labels);
@@ -90,10 +95,22 @@ public class DendrogramaDrawer {
         if (node == null) return;
 
         Point2D pos = positions.get(node);
-        Color color = colorMap.getOrDefault(node, Color.BLACK); // Default to black
+        Color color = colorMap.getOrDefault(node, Color.BLACK);
 
         if (node.esHoja()) {
-            Text label = new Text(node.getEtiqueta());
+            // Obtener las etiquetas de la hoja
+            ListaDoble<String> elementos = node.getElementos();
+            StringBuilder labelText = new StringBuilder();
+
+            ListaDoble.IteradorLista<String> it = elementos.iterador();
+            boolean primero = true;
+            while (it.tieneSiguiente()) {
+                if (!primero) labelText.append(", ");
+                labelText.append(it.siguiente());
+                primero = false;
+            }
+
+            Text label = new Text(labelText.toString());
             label.setFont(Font.font(FONT_SIZE));
             label.setFill(color);
             label.setStyle("-fx-font-weight: bold;");
@@ -101,7 +118,7 @@ public class DendrogramaDrawer {
             // Center the label horizontally
             double labelWidth = label.getLayoutBounds().getWidth();
             label.setX(pos.getX() - (labelWidth / 2));
-            label.setY(pos.getY() + 20); // Position below the line end
+            label.setY(pos.getY() + FONT_SIZE + 5); // Position below the line end, considering font size
             pane.getChildren().add(label);
 
         } else {
@@ -138,13 +155,13 @@ public class DendrogramaDrawer {
         calculateInternalX(root, positions);
 
         // Recalculate height requirements for horizontal labels
-        double labelZoneHeight = FONT_SIZE + 30; // Font height + padding
-        double dendrogramZoneHeight = 600;
-        double paneHeight = dendrogramZoneHeight + labelZoneHeight;
+        double labelZoneHeight = 50.0; // Fixed height for labels below the dendrogram
+        double dendrogramZoneHeight = pane.getPrefHeight() - labelZoneHeight - PADDING_TOP_BOTTOM;
+        double paneHeight = pane.getPrefHeight();
 
         double scaleY = (dendrogramZoneHeight - PADDING_TOP_BOTTOM * 2) / maxDist;
 
-        setYPositions(root, positions, scaleY, paneHeight);
+        setYPositions(root, positions, scaleY, paneHeight, dendrogramZoneHeight);
 
         pane.setPrefSize(paneWidth, paneHeight);
         return positions;
@@ -171,14 +188,14 @@ public class DendrogramaDrawer {
         positions.put(node, new Point2D(x, 0));
     }
 
-    private static void setYPositions(Nodo node, Map<Nodo, Point2D> positions, double scaleY, double paneHeight) {
+    private static void setYPositions(Nodo node, Map<Nodo, Point2D> positions, double scaleY, double paneHeight, double dendrogramZoneHeight) {
         double x = positions.get(node).getX();
-        double y = paneHeight - (PADDING_TOP_BOTTOM + node.getDistancia() * scaleY);
+        double y = PADDING_TOP_BOTTOM + (dendrogramZoneHeight - node.getDistancia() * scaleY);
         positions.put(node, new Point2D(x, y));
 
         if (!node.esHoja()) {
-            setYPositions(node.getIzquierdo(), positions, scaleY, paneHeight);
-            setYPositions(node.getDerecho(), positions, scaleY, paneHeight);
+            setYPositions(node.getIzquierdo(), positions, scaleY, paneHeight, dendrogramZoneHeight);
+            setYPositions(node.getDerecho(), positions, scaleY, paneHeight, dendrogramZoneHeight);
         }
     }
 }

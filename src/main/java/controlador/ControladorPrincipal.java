@@ -13,6 +13,8 @@ import modelo.datos.CargadorCSV;
 import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
+import modelo.estructuras.Dendograma;
+import modelo.estructuras.ListaDoble;
 import modelo.normalizacion.Normalizador;
 import modelo.normalizacion.FactoryNormalizacion;
 import modelo.distancias.CalculadorMatrizDistancia;
@@ -31,7 +33,6 @@ import java.util.stream.Collectors;
 
 public class ControladorPrincipal {
 
-    // Elementos de la UI (Vista)
     @FXML private Label lblArchivoSeleccionado;
     @FXML private ComboBox<String> cmbNormalizacion;
     @FXML private ComboBox<String> cmbDistancia;
@@ -48,14 +49,14 @@ public class ControladorPrincipal {
     @FXML private ProgressBar progressBar;
     @FXML private Label lblEstado;
 
-    // Modelo (lógica de negocio)
     private CargadorCSV cargador;
     private SelectorColumnas selector;
     private Ponderador ponderador;
     private Vector[] vectores;
     private Nodo dendrogramaRaiz;
+    private Dendograma dendograma;
     private File archivoCSV;
-    private String reportePrincipalCache = ""; // Cache for the main report
+    private String reportePrincipalCache = "";
 
     @FXML
     public void initialize() {
@@ -79,6 +80,8 @@ public class ControladorPrincipal {
 
         progressBar.setVisible(false);
         lblEstado.setText("Esperando carga de archivo CSV...");
+
+        dendograma = new Dendograma();
     }
 
     @FXML
@@ -242,18 +245,21 @@ public class ControladorPrincipal {
                             "Normalización: " + cmbNormalizacion.getValue() + "\n" +
                             "Distancia: " + cmbDistancia.getValue() + "\n" +
                             "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
-                            "Altura del árbol: " + dendrogramaRaiz.altura() + "\n" +
-                            "Hojas: " + dendrogramaRaiz.contarHojas() + "\n" +
+                            "Altura del árbol: " + dendograma.altura(dendrogramaRaiz) + "\n" +
+                            "Hojas: " + dendograma.contarHojas(dendrogramaRaiz) + "\n" +
                             "Distancia máx. de fusión: " + String.format("%.4f", dendrogramaRaiz.getDistancia()) + "\n" +
                             "Fusiones: " + motor.obtenerNumeroFusiones());
 
-                    reportePrincipalCache = resultado.toString(); // Cache the main report
+                    reportePrincipalCache = resultado.toString();
 
                     List<Nodo> clustersParaColorear = new ArrayList<>();
 
                     if (k > 1 && dendrogramaRaiz != null) {
                         try {
-                            clustersParaColorear = dendrogramaRaiz.cortarArbol(k);
+                            ListaDoble<Nodo> clusters = dendograma.cortarArbol(dendrogramaRaiz, k);
+                            for (int i = 0; i < clusters.tamanio(); i++) {
+                                clustersParaColorear.add(clusters.obtener(i));
+                            }
                             resultado.append("\n\n").append(generarReporteClusters(clustersParaColorear));
                         } catch (Exception e) {
                             resultado.append("\n\nError al cortar el árbol: ").append(e.getMessage());
@@ -291,8 +297,8 @@ public class ControladorPrincipal {
 
         String umbralStr = txtDistanciaUmbral.getText();
         if (umbralStr == null || umbralStr.isBlank()) {
-            txtResultado.setText(reportePrincipalCache); // Restore main report
-            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, null); // Redraw with no colors
+            txtResultado.setText(reportePrincipalCache);
+            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, null);
             return;
         }
 
@@ -303,7 +309,12 @@ public class ControladorPrincipal {
                 return;
             }
 
-            List<Nodo> clusters = dendrogramaRaiz.cortarPorDistancia(umbral);
+            ListaDoble<Nodo> clustersLista = dendograma.cortarPorDistancia(dendrogramaRaiz, umbral);
+            List<Nodo> clusters = new ArrayList<>();
+            for (int i = 0; i < clustersLista.tamanio(); i++) {
+                clusters.add(clustersLista.obtener(i));
+            }
+
             String reporteCorte = generarReporteClusters(clusters);
             txtResultado.setText(reportePrincipalCache + "\n\n" + reporteCorte);
             DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clusters);
@@ -322,9 +333,10 @@ public class ControladorPrincipal {
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         for (int i = 0; i < clusters.size(); i++) {
             Nodo cluster = clusters.get(i);
-            sb.append("Cluster ").append(i + 1).append(" (").append(cluster.contarHojas()).append(" miembros):\n");
-            List<String> etiquetas = cluster.obtenerEtiquetasHojas();
-            sb.append("  ").append(etiquetas.stream().collect(Collectors.joining(", "))).append("\n\n");
+            sb.append("Cluster ").append(i + 1).append(" (").append(dendograma.contarHojas(cluster)).append(" miembros):\n");
+
+            String[] etiquetas = dendograma.obtenerEtiquetasHojas(cluster);
+            sb.append("  ").append(String.join(", ", etiquetas)).append("\n\n");
         }
         return sb.toString();
     }
@@ -348,7 +360,7 @@ public class ControladorPrincipal {
 
         if (archivo != null) {
             try (FileWriter writer = new FileWriter(archivo)) {
-                String json = dendrogramaRaiz.toJSON();
+                String json = dendograma.toJSON(dendrogramaRaiz);
                 writer.write(json);
                 mostrarInformacion("Exportación exitosa",
                         "JSON guardado en:\n" + archivo.getAbsolutePath());
@@ -359,15 +371,15 @@ public class ControladorPrincipal {
             }
         }
     }
-    
+
     private void actualizarTextoResultadoCarga(){
         txtResultado.setText(
-            "✓ Archivo cargado exitosamente\n" +
-            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-            "Películas: " + cargador.getNumeroFilas() + "\n" +
-            "Dimensiones totales: " + cargador.getDimensiones() + "\n" +
-            "Variables seleccionadas: " + selector.getNumeroSeleccionadas() + "\n" +
-            "Variables a usar: " + String.join(", ", selector.getColumnasSeleccionadas())
+                "✓ Archivo cargado exitosamente\n" +
+                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                        "Películas: " + cargador.getNumeroFilas() + "\n" +
+                        "Dimensiones totales: " + cargador.getDimensiones() + "\n" +
+                        "Variables seleccionadas: " + selector.getNumeroSeleccionadas() + "\n" +
+                        "Variables a usar: " + String.join(", ", selector.getColumnasSeleccionadas())
         );
     }
 

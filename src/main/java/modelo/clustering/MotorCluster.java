@@ -1,10 +1,9 @@
 package modelo.clustering;
 
-import modelo.estructuras.Vector;
-import modelo.estructuras.Matriz;
-import modelo.estructuras.Nodo;
+import modelo.estructuras.*;
 import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
+import modelo.estructuras.Vector;
 
 import java.util.*;
 
@@ -23,9 +22,8 @@ public class MotorCluster {
     private List<Double> distanciasFusion;
     private TipoEnlace tipoEnlace;
     private CalculadorMatrizDistancia calculador;
-    private int[] tamanoClusters; // Tamaño de cada cluster para PROMEDIO
+    private int[] tamanoClusters;
 
-    // por defecto PROMEDIO
     public MotorCluster() {
         this.tipoEnlace = TipoEnlace.PROMEDIO;
         this.clusters = new ArrayList<>();
@@ -34,7 +32,6 @@ public class MotorCluster {
         this.tamanoClusters = new int[0];
     }
 
-    // con tipoEnlace definido por parametro
     public MotorCluster(TipoEnlace tipoEnlace) {
         this.tipoEnlace = tipoEnlace;
         this.clusters = new ArrayList<>();
@@ -43,14 +40,6 @@ public class MotorCluster {
         this.tamanoClusters = new int[0];
     }
 
-    /**
-     * Ejecuta el algoritmo de clustering jerárquico con Lance-Williams
-     * Complejidad: O(n²)
-     *
-     * @param vectores Array de vectores normalizados
-     * @param tipoDistancia Métrica de distancia a usar
-     * @return Nodo raíz del dendrograma
-     */
     public Nodo construirDendrograma(Vector[] vectores, FactoryDistancia.TipoDistancia tipoDistancia) {
         if (vectores == null || vectores.length == 0) {
             throw new IllegalArgumentException("Array de vectores no puede estar vacío");
@@ -59,40 +48,35 @@ public class MotorCluster {
         this.vectores = vectores;
         this.distanciasFusion.clear();
 
-        // Paso 1: Crear matriz de distancias inicial
         System.out.println("  [Clustering] Calculando matriz de distancias inicial...");
         matrizDistancias = calculador.calcular(vectores, tipoDistancia);
 
-        // Paso 2: Inicializar clusters y tamaños
         inicializarClusters();
 
-        // Paso 3: Algoritmo aglomerativo con Lance-Williams
         int iteracion = 0;
         long inicio = System.currentTimeMillis();
 
         while (clusters.size() > 1) {
             iteracion++;
-            if (iteracion % 100 == 0) {
-                System.out.println("  [Clustering] Iteración " + iteracion +
-                        " - Clusters restantes: " + clusters.size());
-            }
 
-            // Encontrar par más cercano
             int[] parMin = encontrarParMasProximo();
             int i = parMin[0];
             int j = parMin[1];
 
+            if (i == -1 || j == -1) {
+                System.err.println("  [ERROR] No se encontró par válido!");
+                System.err.println("  Clusters restantes: " + clusters.size());
+                break;
+            }
+
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
             distanciasFusion.add(distanciaFusion);
 
-            // Crear nuevo cluster fusionando i y j
             Nodo nuevoCluster = new Nodo(clusters.get(i), clusters.get(j), distanciaFusion);
             int nuevoTamano = tamanoClusters[i] + tamanoClusters[j];
 
-            // Actualizar matriz con Lance-Williams (sin recalcular todo)
             actualizarMatrizLanceWilliams(i, j, distanciaFusion);
 
-            // Remover los clusters viejos (primero el mayor índice)
             if (i > j) {
                 clusters.remove(i);
                 tamanoClusters = removerIndice(tamanoClusters, i);
@@ -105,7 +89,6 @@ public class MotorCluster {
                 tamanoClusters = removerIndice(tamanoClusters, i);
             }
 
-            // Agregar nuevo cluster
             clusters.add(nuevoCluster);
             tamanoClusters = agregarElemento(tamanoClusters, nuevoTamano);
         }
@@ -114,14 +97,9 @@ public class MotorCluster {
         System.out.println("  [Clustering] Completado en " + (duracion / 1000.0) + " segundos");
         System.out.println("  [Clustering] Total de fusiones: " + distanciasFusion.size());
 
-        // Paso 4: Retornar raíz del dendrograma
         return clusters.get(0);
     }
 
-    /**
-     * Ejecuta clustering con nombre de distancia en string
-     * Complejidad: O(n²)
-     */
     public Nodo construirDendrograma(Vector[] vectores, String nombreDistancia) {
         FactoryDistancia.TipoDistancia tipo = FactoryDistancia.TipoDistancia.valueOf(
                 nombreDistancia.toUpperCase()
@@ -146,6 +124,10 @@ public class MotorCluster {
         for (int i = 0; i < clusters.size(); i++) {
             for (int j = i + 1; j < clusters.size(); j++) {
                 double distancia = matrizDistancias.getPosicion(i, j);
+                if (Double.isNaN(distancia) || Double.isInfinite(distancia)) {
+                    System.err.println("  [WARN] Distancia inválida en [" + i + "][" + j + "]: " + distancia);
+                    continue;
+                }
                 if (distancia < minimo) {
                     minimo = distancia;
                     resultado[0] = i;
@@ -153,19 +135,19 @@ public class MotorCluster {
                 }
             }
         }
-
+        if (resultado[0] == -1 && clusters.size() > 1) {
+            System.err.println("  [ERROR] No se encontró ningún par válido!");
+            System.err.println("  Mínima distancia encontrada: " + minimo);
+        }
         return resultado;
     }
 
-    // actualiza la matriz usando fórmula Lance-Williams
-    // formula: d(nuevo, k) = α*d(i,k) + β*d(j,k) + γ*d(i,j)
     private void actualizarMatrizLanceWilliams(int i, int j, double distanciaIJ) {
         int ni = tamanoClusters[i];
         int nj = tamanoClusters[j];
 
         double alpha_i, alpha_j, gamma;
 
-        // calcular parámetros según tipo de enlace
         switch (tipoEnlace) {
             case MINIMO:
                 alpha_i = 0.5;
@@ -191,19 +173,16 @@ public class MotorCluster {
                 throw new IllegalArgumentException("Tipo de enlace no soportado");
         }
 
-        // actualizar distancias del nuevo cluster con todos los demas
         for (int k = 0; k < clusters.size(); k++) {
             if (k == i || k == j) continue;
 
             double distanciaIK = matrizDistancias.getPosicion(i, k);
             double distanciaJK = matrizDistancias.getPosicion(j, k);
 
-            // aplicar Lance-Williams
             double nuevaDistancia = alpha_i * distanciaIK +
                     alpha_j * distanciaJK +
                     gamma * distanciaIJ;
 
-            // remplazar i con nuevo cluster
             matrizDistancias.setPosicion(i, k, nuevaDistancia);
             matrizDistancias.setPosicion(k, i, nuevaDistancia);
         }
@@ -244,11 +223,12 @@ public class MotorCluster {
     }
 
     public void imprimirDendrograma(Nodo raiz) {
+        Dendograma dendo = new Dendograma();
         System.out.println("=== Dendrograma ===");
         System.out.println("Tipo de enlace: " + tipoEnlace);
         System.out.println("Distancias de fusión: " + distanciasFusion.size());
         System.out.println();
-        System.out.println(raiz.toStringArbol());
+        System.out.println(dendo.toStringArbol(raiz));
     }
 
     public void imprimirEstadisticas() {
