@@ -9,6 +9,7 @@ public class Nodo {
 
     public Nodo(String elemento) {
         this.elementos = new ListaDoble<>();
+        this.elementos.agregar(elemento);
         this.distancia = 0.0;
         this.izquierdo = null;
         this.derecho = null;
