@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import modelo.estructuras.ListaDoble;
 import modelo.estructuras.Nodo;
 
 import java.util.ArrayList;
@@ -79,7 +80,11 @@ public class DendrogramaDrawer {
 
     private static void getLeafLabels(Nodo node, List<String> labels) {
         if (node.esHoja()) {
-            labels.add(node.getEtiqueta());
+            // Una hoja puede tener uno o más elementos
+            ListaDoble.IteradorLista<String> it = node.getElementos().iterador();
+            while (it.tieneSiguiente()) {
+                labels.add(it.siguiente());
+            }
             return;
         }
         getLeafLabels(node.getIzquierdo(), labels);
@@ -90,10 +95,22 @@ public class DendrogramaDrawer {
         if (node == null) return;
 
         Point2D pos = positions.get(node);
-        Color color = colorMap.getOrDefault(node, Color.BLACK); // Default to black
+        Color color = colorMap.getOrDefault(node, Color.BLACK);
 
         if (node.esHoja()) {
-            Text label = new Text(node.getEtiqueta());
+            // Obtener las etiquetas de la hoja
+            ListaDoble<String> elementos = node.getElementos();
+            StringBuilder labelText = new StringBuilder();
+
+            ListaDoble.IteradorLista<String> it = elementos.iterador();
+            boolean primero = true;
+            while (it.tieneSiguiente()) {
+                if (!primero) labelText.append(", ");
+                labelText.append(it.siguiente());
+                primero = false;
+            }
+
+            Text label = new Text(labelText.toString());
             label.setFont(Font.font(FONT_SIZE));
             label.setFill(color);
             label.setStyle("-fx-font-weight: bold;");
