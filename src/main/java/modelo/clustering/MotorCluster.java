@@ -10,10 +10,10 @@ import java.util.*;
 public class MotorCluster {
 
     public enum TipoEnlace {
-        MINIMO,      // single linkage
-        MAXIMO,      // complete linkage
-        PROMEDIO,    // average linkage
-        CENTROIDE    // centroid linkage
+        MINIMO,
+        MAXIMO,
+        PROMEDIO,
+        CENTROIDE
     }
 
     private Vector[] vectores;
@@ -64,7 +64,7 @@ public class MotorCluster {
             int j = parMin[1];
 
             if (i == -1 || j == -1) {
-                System.err.println("  [ERROR] No se encontró par válido!");
+                System.err.println("  No se encontró par válido");
                 System.err.println("  Clusters restantes: " + clusters.size());
                 break;
             }
@@ -94,8 +94,8 @@ public class MotorCluster {
         }
 
         long duracion = System.currentTimeMillis() - inicio;
-        System.out.println("  [Clustering] Completado en " + (duracion / 1000.0) + " segundos");
-        System.out.println("  [Clustering] Total de fusiones: " + distanciasFusion.size());
+        System.out.println("  Clustering - Completado en " + (duracion / 1000.0) + " segundos");
+        System.out.println("  Clustering -  Total de fusiones: " + distanciasFusion.size());
 
         return clusters.get(0);
     }

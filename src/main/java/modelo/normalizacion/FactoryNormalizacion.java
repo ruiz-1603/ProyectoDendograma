@@ -8,10 +8,6 @@ public class FactoryNormalizacion {
         LOGARITMICA
     }
 
-    /**
-     * Crea una estrategia de normalización por tipo enum
-     * Complejidad: O(1)
-     */
     public static INormalizacion crear(TipoNormalizacion tipo) {
         switch (tipo) {
             case MIN_MAX:
@@ -25,10 +21,6 @@ public class FactoryNormalizacion {
         }
     }
 
-    /**
-     * Crea una estrategia desde un nombre (string)
-     * Complejidad: O(1)
-     */
     public static INormalizacion crear(String nombre) {
         if (nombre == null) {
             throw new IllegalArgumentException("El nombre no puede ser null");
@@ -60,18 +52,10 @@ public class FactoryNormalizacion {
         }
     }
 
-    /**
-     * Retorna todos los tipos disponibles
-     * Complejidad: O(1)
-     */
     public static TipoNormalizacion[] getTiposDisponibles() {
         return TipoNormalizacion.values();
     }
 
-    /**
-     * Retorna nombres de todas las estrategias
-     * Complejidad: O(m) donde m es número de tipos
-     */
     public static String[] obtenerNombres() {
         TipoNormalizacion[] tipos = TipoNormalizacion.values();
         String[] nombres = new String[tipos.length];
@@ -83,10 +67,6 @@ public class FactoryNormalizacion {
         return nombres;
     }
 
-    /**
-     * Valida si un nombre es válido
-     * Complejidad: O(1)
-     */
     public static boolean esNombreValido(String nombre) {
         try {
             crear(nombre);

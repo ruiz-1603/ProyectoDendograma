@@ -15,7 +15,6 @@ public class DistanciaManhattan implements ICalculadorDistancia {
 
         double suma = 0.0;
 
-        // Σ|xi - yi|
         for (int i = 0; i < v1.dimension(); i++) {
             double diferencia = v1.getPosicion(i) - v2.getPosicion(i);
             suma += Math.abs(diferencia);

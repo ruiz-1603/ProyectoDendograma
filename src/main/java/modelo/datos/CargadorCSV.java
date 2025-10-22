@@ -107,7 +107,6 @@ public class CargadorCSV {
             }
         }
 
-        // procesar datos
         extraerCategoriasUnicas();
         extraerRangoFechas();
 
@@ -253,7 +252,6 @@ public class CargadorCSV {
         return total;
     }
 
-    // parsea una línea CSV respetando comillas (RFC 4180)
     private String[] parsearLinea(String linea) {
         List<String> campos = new ArrayList<>();
         StringBuilder campoActual = new StringBuilder();

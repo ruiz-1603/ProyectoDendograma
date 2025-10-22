@@ -71,7 +71,6 @@ public class Ponderador {
         for (int v = 0; v < vectores.length; v++) {
             Vector original = vectores[v];
 
-            // validar dimension
             if (original.dimension() != pesos.length) {
                 throw new IllegalArgumentException(
                         "Dimensión del vector (" + original.dimension() +
@@ -79,7 +78,6 @@ public class Ponderador {
                 );
             }
 
-            // nuevo vector ponderado
             double[] datosPonderados = new double[pesos.length];
 
             for (int i = 0; i < pesos.length; i++) {

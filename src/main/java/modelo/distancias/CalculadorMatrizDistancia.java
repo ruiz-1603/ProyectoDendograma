@@ -17,14 +17,6 @@ public class CalculadorMatrizDistancia {
         this.etiquetas = new String[0];
     }
 
-    /**
-     * Calcula la matriz de distancias
-     * Complejidad: O(n²*m)
-     *
-     * @param vectores Array de vectores
-     * @param tipoDistancia Tipo de distancia a usar
-     * @return Matriz de distancias (simétrica)
-     */
     public Matriz calcular(Vector[] vectores, FactoryDistancia.TipoDistancia tipoDistancia) {
         if (vectores == null || vectores.length == 0) {
             throw new IllegalArgumentException("Array de vectores no puede estar vacío");
@@ -47,7 +39,6 @@ public class CalculadorMatrizDistancia {
             for (int j = i + 1; j < n; j++) {
                 double distancia = calculador.calcular(vectores[i], vectores[j]);
 
-                // Matriz simétrica
                 matrizDistancias.setPosicion(i, j, distancia);
                 matrizDistancias.setPosicion(j, i, distancia);
             }
@@ -80,7 +71,7 @@ public class CalculadorMatrizDistancia {
     }
 
     // por indice
-    public double obtenerDistancia(int i, int j) {
+    public double getDistancia(int i, int j) {
         if (matrizDistancias == null) {
             throw new IllegalStateException("No hay matriz calculada");
         }
@@ -88,7 +79,7 @@ public class CalculadorMatrizDistancia {
     }
 
     // por etiqueta
-    public double obtenerDistancia(String etiqueta1, String etiqueta2) {
+    public double getDistancia(String etiqueta1, String etiqueta2) {
         int i = obtenerIndiceEtiqueta(etiqueta1);
         int j = obtenerIndiceEtiqueta(etiqueta2);
 
@@ -96,7 +87,7 @@ public class CalculadorMatrizDistancia {
             throw new IllegalArgumentException("Etiqueta no encontrada");
         }
 
-        return obtenerDistancia(i, j);
+        return getDistancia(i, j);
     }
 
     // encuentra el indice de una etiqueta

@@ -12,7 +12,7 @@ public class Dendograma {
         StringBuilder sb = new StringBuilder();
 
         sb.append(indent).append("{\n");
-        sb.append(indent).append("  \"n\": \"").append(nodo.obtenerNombre()).append("\",\n");
+        sb.append(indent).append("  \"n\": \"").append(nodo.getNombre()).append("\",\n");
         sb.append(indent).append("  \"d\": ").append(nodo.getDistancia()).append(",\n");
         sb.append(indent).append("  \"c\": ");
 
@@ -81,7 +81,7 @@ public class Dendograma {
         String indent = "  ".repeat(nivel);
 
         sb.append(indent)
-                .append(nodo.obtenerNombre())
+                .append(nodo.getNombre())
                 .append(" [d=")
                 .append(String.format("%.2f", nodo.getDistancia()))
                 .append("]\n");

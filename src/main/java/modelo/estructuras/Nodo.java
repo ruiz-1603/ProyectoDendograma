@@ -31,7 +31,7 @@ public class Nodo {
         return izquierdo == null && derecho == null;
     }
 
-    public String obtenerNombre() { return "(" + elementos.toString().replace(", ", ";") + ")"; }
+    public String getNombre() { return "(" + elementos.toString().replace(", ", ";") + ")"; }
 
     public Nodo getIzquierdo() {
         return izquierdo;
@@ -51,7 +51,7 @@ public class Nodo {
 
     @Override
     public String toString() {
-        return obtenerNombre() + " [d=" + String.format("%.2f", distancia)
+        return getNombre() + " [d=" + String.format("%.2f", distancia)
                 + ", elementos=" + elementos.tamanio() + "]";
     }
 }

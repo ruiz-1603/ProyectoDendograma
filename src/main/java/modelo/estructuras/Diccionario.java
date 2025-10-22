@@ -36,17 +36,17 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
         }
 
         @Override
-        public K obtenerClave() {
+        public K getClave() {
             return clave;
         }
 
         @Override
-        public V obtenerValor() {
+        public V getValor() {
             return valor;
         }
 
         @Override
-        public V establecerValor(V valor) {
+        public V setValor(V valor) {
             V valorAntiguo = this.valor;
             this.valor = valor;
             return valorAntiguo;
@@ -77,8 +77,8 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
 
         for (int i = 0; i < cubo.tamanio(); i++) {
             Entrada<K, V> entrada = cubo.obtener(i);
-            if (entrada.obtenerClave().equals(clave)) {
-                return entrada.establecerValor(valor);
+            if (entrada.getClave().equals(clave)) {
+                return entrada.setValor(valor);
             }
         }
 
@@ -98,8 +98,8 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
 
         for (int i = 0; i < cubo.tamanio(); i++) {
             Entrada<K, V> entrada = cubo.obtener(i);
-            if (entrada.obtenerClave().equals(clave)) {
-                return entrada.obtenerValor();
+            if (entrada.getClave().equals(clave)) {
+                return entrada.getValor();
             }
         }
         return null;
@@ -112,10 +112,10 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
 
         for (int i = 0; i < cubo.tamanio(); i++) {
             Entrada<K, V> entrada = cubo.obtener(i);
-            if (entrada.obtenerClave().equals(clave)) {
+            if (entrada.getClave().equals(clave)) {
                 cubo.eliminarElemento(entrada);
                 tamanioActual--;
-                return entrada.obtenerValor();
+                return entrada.getValor();
             }
         }
         return null;
@@ -128,7 +128,7 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
 
         for (int i = 0; i < cubo.tamanio(); i++) {
             Entrada<K, V> entrada = cubo.obtener(i);
-            if (entrada.obtenerClave().equals(clave)) {
+            if (entrada.getClave().equals(clave)) {
                 return true;
             }
         }
@@ -150,7 +150,7 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
         ListaDoble<K> claves = new ListaDoble<>();
         for (ListaDoble<Entrada<K, V>> cubo : tabla) {
             for (int i = 0; i < cubo.tamanio(); i++) {
-                claves.agregar(cubo.obtener(i).obtenerClave());
+                claves.agregar(cubo.obtener(i).getClave());
             }
         }
         return claves;
@@ -161,7 +161,7 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
         ListaDoble<V> valores = new ListaDoble<>();
         for (ListaDoble<Entrada<K, V>> cubo : tabla) {
             for (int i = 0; i < cubo.tamanio(); i++) {
-                valores.agregar(cubo.obtener(i).obtenerValor());
+                valores.agregar(cubo.obtener(i).getValor());
             }
         }
         return valores;
@@ -191,7 +191,7 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
         for (ListaDoble<Entrada<K, V>> cubo : tablaAntigua) {
             for (int i = 0; i < cubo.tamanio(); i++) {
                 Entrada<K, V> entrada = cubo.obtener(i);
-                poner(entrada.obtenerClave(), entrada.obtenerValor());
+                poner(entrada.getClave(), entrada.getValor());
             }
         }
     }

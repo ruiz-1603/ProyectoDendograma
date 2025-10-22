@@ -13,8 +13,8 @@ public interface IDiccionario<K, V> {
     ListaDoble<Entrada<K, V>> conjuntoEntradas();
 
     interface Entrada<K, V> {
-        K obtenerClave();
-        V obtenerValor();
-        V establecerValor(V valor);
+        K getClave();
+        V getValor();
+        V setValor(V valor);
     }
 }

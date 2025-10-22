@@ -65,28 +65,4 @@ public class FactoryDistancia {
         }
     }
 
-    public static TipoDistancia[] getTiposDisponibles() {
-        return TipoDistancia.values();
-    }
-
-    public static String[] obtenerNombresDisponibles() {
-        TipoDistancia[] tipos = TipoDistancia.values();
-        String[] nombres = new String[tipos.length];
-
-        for (int i = 0; i < tipos.length; i++) {
-            ICalculadorDistancia calc = crear(tipos[i]);
-            nombres[i] = calc.getNombre();
-        }
-
-        return nombres;
-    }
-
-    public static boolean esNombreValido(String nombre) {
-        try {
-            crear(nombre);
-            return true;
-        } catch (IllegalArgumentException e) {
-            return false;
-        }
-    }
 }

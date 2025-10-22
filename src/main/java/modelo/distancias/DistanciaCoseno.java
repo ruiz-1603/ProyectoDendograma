@@ -16,19 +16,17 @@ public class DistanciaCoseno implements ICalculadorDistancia {
         // calcular producto punto: x·y
         double productoPunto = v1.productoPunto(v2);
 
-        // calcular normas: ||x|| y ||y||
+        // calcular normas
         double normaV1 = v1.norma();
         double normaV2 = v2.norma();
 
-        // evitar division por cero
         if (normaV1 == 0.0 || normaV2 == 0.0) {
             return 1.0; // max distancia si algun vector es cero
         }
 
-        // similitud coseno: (x·y)/(||x|| * ||y||)
+        // similitud coseno
         double similaridad = productoPunto / (normaV1 * normaV2);
 
-        // distancia coseno: 1 - similaridad
         return 1.0 - similaridad;
     }
 

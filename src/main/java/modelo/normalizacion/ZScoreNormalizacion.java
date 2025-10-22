@@ -35,7 +35,7 @@ public class ZScoreNormalizacion implements INormalizacion {
             desviacionesEstandar[i] = Math.sqrt(varianza);
         }
 
-        // Normalizar cada vector
+        // nnormalizar cada vector
         for (int v = 0; v < vectores.length; v++) {
             double[] datosNormalizados = new double[dimension];
 
@@ -43,7 +43,6 @@ public class ZScoreNormalizacion implements INormalizacion {
                 double valor = vectores[v].getPosicion(i);
                 double sigma = desviacionesEstandar[i];
 
-                // Evitar división por cero
                 if (sigma == 0.0) {
                     datosNormalizados[i] = 0.0;
                 } else {
