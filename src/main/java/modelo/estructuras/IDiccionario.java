@@ -10,7 +10,6 @@ public interface IDiccionario<K, V> {
     void limpiar();
     ListaDoble<K> conjuntoClaves();
     ListaDoble<V> coleccionValores();
-    ListaDoble<Entrada<K, V>> conjuntoEntradas();
 
     interface Entrada<K, V> {
         K getClave();

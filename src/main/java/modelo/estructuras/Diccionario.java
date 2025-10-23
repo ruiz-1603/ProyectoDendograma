@@ -167,17 +167,6 @@ public class Diccionario<K, V> implements IDiccionario<K, V> {
         return valores;
     }
 
-    @Override
-    public ListaDoble<Entrada<K, V>> conjuntoEntradas() {
-        ListaDoble<Entrada<K, V>> entradas = new ListaDoble<>();
-        for (ListaDoble<Entrada<K, V>> cubo : tabla) {
-            for (int i = 0; i < cubo.tamanio(); i++) {
-                entradas.agregar(cubo.obtener(i));
-            }
-        }
-        return entradas;
-    }
-
     private void redimensionar() {
         int nuevaCapacidad = tabla.length * 2;
         ListaDoble<Entrada<K, V>>[] tablaAntigua = tabla;
