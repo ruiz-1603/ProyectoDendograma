@@ -10,6 +10,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import modelo.datos.CargadorCSV;
+import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
 import modelo.estructuras.Dendograma;

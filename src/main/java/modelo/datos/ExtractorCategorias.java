@@ -3,6 +3,7 @@ package modelo.datos;
 import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
 
+import modelo.estructuras.ListaDoble;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -46,8 +47,11 @@ public class ExtractorCategorias {
 
     public int contarDimensionesOneHot() {
         int total = 0;
-        for (String columna : categoriasUnicas.conjuntoClaves().aArreglo()) {
-            List<String> categorias = categoriasUnicas.obtener((String) columna);
+        ListaDoble<String> claves = categoriasUnicas.conjuntoClaves();
+
+        for (int i = 0; i < claves.tamanio(); i++) {
+            String columna = claves.obtener(i);
+            List<String> categorias = categoriasUnicas.obtener(columna);
             if (categorias == null) {
                 categorias = new ArrayList<>();
             }
