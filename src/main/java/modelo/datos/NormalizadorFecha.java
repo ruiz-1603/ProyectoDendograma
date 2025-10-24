@@ -1,12 +1,10 @@
 package modelo.datos;
 
 import modelo.estructuras.IDiccionario;
+import modelo.estructuras.ListaDoble;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Responsabilidad: Normalizar fechas a valores numéricos [0, 1]
@@ -23,25 +21,48 @@ public class NormalizadorFecha {
         this.fechaMaxima = LocalDate.now();
     }
 
-    public void extraerRango(List<IDiccionario<String, String>> filas, String columnaFecha) {
-        List<LocalDate> fechas = new ArrayList<>();
+    public void extraerRango(ListaDoble<IDiccionario<String, String>> filas, String columnaFecha) {
+        ListaDoble<LocalDate> fechas = new ListaDoble<>();
 
-        for (IDiccionario<String, String> fila : filas) {
+        for (int i = 0; i < filas.tamanio(); i++) {
+            IDiccionario<String, String> fila = filas.obtener(i);
             String fechaStr = fila.obtener(columnaFecha);
             if (fechaStr != null && !fechaStr.isEmpty() && !fechaStr.equals("null")) {
                 try {
                     LocalDate fecha = LocalDate.parse(fechaStr.trim(), formateador);
-                    fechas.add(fecha);
+                    fechas.agregar(fecha);
                 } catch (Exception e) {
                     // Ignorar fechas inválidas
                 }
             }
         }
 
-        if (!fechas.isEmpty()) {
-            fechaMinima = Collections.min(fechas);
-            fechaMaxima = Collections.max(fechas);
+        if (fechas.tamanio() > 0) {
+            fechaMinima = encontrarMinimo(fechas);
+            fechaMaxima = encontrarMaximo(fechas);
         }
+    }
+
+    private LocalDate encontrarMinimo(ListaDoble<LocalDate> fechas) {
+        LocalDate min = fechas.obtener(0);
+        for (int i = 1; i < fechas.tamanio(); i++) {
+            LocalDate actual = fechas.obtener(i);
+            if (actual.isBefore(min)) {
+                min = actual;
+            }
+        }
+        return min;
+    }
+
+    private LocalDate encontrarMaximo(ListaDoble<LocalDate> fechas) {
+        LocalDate max = fechas.obtener(0);
+        for (int i = 1; i < fechas.tamanio(); i++) {
+            LocalDate actual = fechas.obtener(i);
+            if (actual.isAfter(max)) {
+                max = actual;
+            }
+        }
+        return max;
     }
 
     public double normalizar(String fechaStr) {

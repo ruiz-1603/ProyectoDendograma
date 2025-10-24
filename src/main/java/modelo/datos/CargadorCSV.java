@@ -1,10 +1,10 @@
 package modelo.datos;
 
 import modelo.estructuras.IDiccionario;
+import modelo.estructuras.ListaDoble;
 import modelo.estructuras.Vector;
 
 import java.io.IOException;
-import java.util.List;
 
 // facade que delega a clases especializadas
 public class CargadorCSV {
@@ -17,7 +17,7 @@ public class CargadorCSV {
     private NombreDimGen generadorNombres;
 
     private String rutaArchivo;
-    private List<IDiccionario<String, String>> datos;
+    private ListaDoble<IDiccionario<String, String>> datos;
 
     public CargadorCSV() {
         this.parser = new ParserCSV();
@@ -49,7 +49,7 @@ public class CargadorCSV {
 
         // Log del resultado
         int totalDimensiones = generadorNombres.calcularTotalDimensiones();
-        System.out.println("✓ CSV cargado: " + datos.size() + " películas");
+        System.out.println("✓ CSV cargado: " + datos.tamanio() + " películas");
         System.out.println("  - Dimensiones numéricas: " + configurador.getColumnasNumericas().length);
         System.out.println("  - Dimensiones categóricas (one-hot): " + extractorCategorias.contarDimensionesOneHot());
         System.out.println("  - Dimensiones de conteo: " +
@@ -79,7 +79,7 @@ public class CargadorCSV {
     }
 
     public int getNumeroFilas() {
-        return datos != null ? datos.size() : 0;
+        return datos != null ? datos.tamanio() : 0;
     }
 
     public String[] getNombresDimensiones() {

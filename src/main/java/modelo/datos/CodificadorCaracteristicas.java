@@ -1,17 +1,20 @@
 package modelo.datos;
 
-import java.util.List;
+import modelo.estructuras.ListaDoble;
 
+/**
+ * Responsabilidad: Codificar características (one-hot encoding, conteos)
+ */
 public class CodificadorCaracteristicas {
 
-    public double[] codificarOneHot(String valor, List<String> categorias) {
+    public double[] codificarOneHot(String valor, ListaDoble<String> categorias) {
         if (valor == null || valor.isEmpty() || valor.equals("null")) {
             valor = "desconocido";
         }
 
-        double[] codificado = new double[categorias.size()];
-        for (int i = 0; i < categorias.size(); i++) {
-            codificado[i] = valor.equals(categorias.get(i)) ? 1.0 : 0.0;
+        double[] codificado = new double[categorias.tamanio()];
+        for (int i = 0; i < categorias.tamanio(); i++) {
+            codificado[i] = valor.equals(categorias.obtener(i)) ? 1.0 : 0.0;
         }
         return codificado;
     }

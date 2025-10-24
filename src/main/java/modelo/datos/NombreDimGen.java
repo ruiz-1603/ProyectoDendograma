@@ -1,7 +1,6 @@
 package modelo.datos;
 
-import java.util.ArrayList;
-import java.util.List;
+import modelo.estructuras.ListaDoble;
 
 /**
  * Responsabilidad: Generar nombres descriptivos para cada dimensión del vector
@@ -18,37 +17,42 @@ public class NombreDimGen {
     }
 
     public String[] generar() {
-        List<String> nombres = new ArrayList<>();
+        ListaDoble<String> nombres = new ListaDoble<>();
 
         // 1. Columnas numéricas
         for (String col : configurador.getColumnasNumericas()) {
-            nombres.add(col);
+            nombres.agregar(col);
         }
 
         // 2. Columnas categóricas (one-hot)
         for (String columna : configurador.getColumnasCategoricas()) {
-            List<String> categorias = extractorCategorias.obtenerCategorias(columna);
+            ListaDoble<String> categorias = extractorCategorias.obtenerCategorias(columna);
             if (categorias != null) {
-                for (String cat : categorias) {
-                    nombres.add(columna + "_" + cat);
+                for (int i = 0; i < categorias.tamanio(); i++) {
+                    String cat = categorias.obtener(i);
+                    nombres.agregar(columna + "_" + cat);
                 }
             }
         }
 
         // 3. Columnas de conteo
         for (String col : configurador.getColumnasConteo()) {
-            nombres.add(col + "_conteo");
+            nombres.agregar(col + "_conteo");
         }
 
         // 4. Columnas de JSON array
         for (String col : configurador.getColumnasJsonArray()) {
-            nombres.add(col + "_conteo");
+            nombres.agregar(col + "_conteo");
         }
 
         // 5. Fecha normalizada
-        nombres.add("release_date_normalizada");
+        nombres.agregar("release_date_normalizada");
 
-        return nombres.toArray(new String[0]);
+        String[] resultado = new String[nombres.tamanio()];
+        for (int i = 0; i < nombres.tamanio(); i++) {
+            resultado[i] = nombres.obtener(i);
+        }
+        return resultado;
     }
 
     public int calcularTotalDimensiones() {

@@ -2,46 +2,72 @@ package modelo.datos;
 
 import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
-
 import modelo.estructuras.ListaDoble;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * Responsabilidad: Extraer y mantener categorías únicas de columnas categóricas
  */
 public class ExtractorCategorias {
 
-    private IDiccionario<String, List<String>> categoriasUnicas;
+    private IDiccionario<String, ListaDoble<String>> categoriasUnicas;
 
     public ExtractorCategorias() {
         this.categoriasUnicas = new Diccionario<>();
     }
 
-    public void extraer(List<IDiccionario<String, String>> filas, String[] columnasCategoricas) {
+    public void extraer(ListaDoble<IDiccionario<String, String>> filas, String[] columnasCategoricas) {
         categoriasUnicas.limpiar();
 
         for (String columna : columnasCategoricas) {
-            Set<String> unicos = new TreeSet<>();
+            IDiccionario<String, Boolean> unicos = new Diccionario<>();
 
-            for (IDiccionario<String, String> fila : filas) {
+            for (int i = 0; i < filas.tamanio(); i++) {
+                IDiccionario<String, String> fila = filas.obtener(i);
                 String valor = fila.obtener(columna);
                 if (valor != null && !valor.isEmpty() && !valor.equals("null")) {
-                    unicos.add(valor.trim());
+                    unicos.poner(valor.trim(), true);
                 }
             }
 
-            if (unicos.isEmpty()) {
-                unicos.add("desconocido");
+            // Si no hay valores únicos, agregar "desconocido"
+            if (unicos.tamanio() == 0) {
+                unicos.poner("desconocido", true);
             }
 
-            categoriasUnicas.poner(columna, new ArrayList<>(unicos));
+            // Convertir a ListaDoble ordenada
+            ListaDoble<String> listaUnicos = new ListaDoble<>();
+            ListaDoble<String> claves = unicos.conjuntoClaves();
+
+            // Ordenar las categorías
+            ListaDoble<String> clavesOrdenadas = ordenarCategorias(claves);
+            for (int i = 0; i < clavesOrdenadas.tamanio(); i++) {
+                listaUnicos.agregar(clavesOrdenadas.obtener(i));
+            }
+
+            categoriasUnicas.poner(columna, listaUnicos);
         }
     }
 
-    public List<String> obtenerCategorias(String columna) {
+    private ListaDoble<String> ordenarCategorias(ListaDoble<String> categorias) {
+        ListaDoble<String> ordenadas = new ListaDoble<>();
+
+        // Copiar todas las categorías
+        for (int i = 0; i < categorias.tamanio(); i++) {
+            ordenadas.agregar(categorias.obtener(i));
+        }
+
+        // Ordenar usando el comparador de ListaDoble
+        ordenadas.ordenar(new ListaDoble.Comparador<String>() {
+            @Override
+            public int comparar(String a, String b) {
+                return a.compareTo(b);
+            }
+        });
+
+        return ordenadas;
+    }
+
+    public ListaDoble<String> obtenerCategorias(String columna) {
         return categoriasUnicas.obtener(columna);
     }
 
@@ -51,16 +77,16 @@ public class ExtractorCategorias {
 
         for (int i = 0; i < claves.tamanio(); i++) {
             String columna = claves.obtener(i);
-            List<String> categorias = categoriasUnicas.obtener(columna);
+            ListaDoble<String> categorias = categoriasUnicas.obtener(columna);
             if (categorias == null) {
-                categorias = new ArrayList<>();
+                categorias = new ListaDoble<>();
             }
-            total += categorias.size();
+            total += categorias.tamanio();
         }
         return total;
     }
 
-    public IDiccionario<String, List<String>> getCategoriasUnicas() {
+    public IDiccionario<String, ListaDoble<String>> getCategoriasUnicas() {
         return categoriasUnicas;
     }
 }

@@ -2,17 +2,13 @@ package modelo.datos;
 
 import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
+import modelo.estructuras.ListaDoble;
 import modelo.estructuras.Vector;
-
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
 
 public class SelectorColumnas {
 
     private String[] todasLasColumnas;
-    private Set<String> columnasSeleccionadas;
+    private IDiccionario<String, Boolean> columnasSeleccionadas;
     private IDiccionario<String, Integer> indiceColumnas;
 
     // todas las columnas
@@ -22,12 +18,12 @@ public class SelectorColumnas {
         }
 
         this.todasLasColumnas = columnasDisponibles.clone();
-        this.columnasSeleccionadas = new LinkedHashSet<>();
+        this.columnasSeleccionadas = new Diccionario<>();
         this.indiceColumnas = new Diccionario<>();
 
         // selecciona todas por defecto
         for (int i = 0; i < columnasDisponibles.length; i++) {
-            columnasSeleccionadas.add(columnasDisponibles[i]);
+            columnasSeleccionadas.poner(columnasDisponibles[i], true);
             indiceColumnas.poner(columnasDisponibles[i], i);
         }
     }
@@ -61,7 +57,7 @@ public class SelectorColumnas {
         if (!indiceColumnas.contieneClave(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
         }
-        columnasSeleccionadas.add(columna);
+        columnasSeleccionadas.poner(columna, true);
     }
 
     // excluye la columna
@@ -69,7 +65,7 @@ public class SelectorColumnas {
         if (!indiceColumnas.contieneClave(columna)) {
             throw new IllegalArgumentException("Columna no existe: " + columna);
         }
-        columnasSeleccionadas.remove(columna);
+        columnasSeleccionadas.eliminar(columna);
     }
 
     public void seleccionarMultiples(String[] columnas) {
@@ -89,59 +85,68 @@ public class SelectorColumnas {
     }
 
     public boolean estaSeleccionada(String columna) {
-        return columnasSeleccionadas.contains(columna);
+        return columnasSeleccionadas.contieneClave(columna);
     }
 
     public String[] getColumnasSeleccionadas() {
-        return columnasSeleccionadas.toArray(new String[0]);
+        ListaDoble<String> claves = columnasSeleccionadas.conjuntoClaves();
+        String[] resultado = new String[claves.tamanio()];
+        for (int i = 0; i < claves.tamanio(); i++) {
+            resultado[i] = claves.obtener(i);
+        }
+        return resultado;
     }
 
     public String[] getColumnasIgnoradas() {
-        List<String> ignoradas = new ArrayList<>();
+        ListaDoble<String> ignoradas = new ListaDoble<>();
 
         for (String col : todasLasColumnas) {
-            if (!columnasSeleccionadas.contains(col)) {
-                ignoradas.add(col);
+            if (!columnasSeleccionadas.contieneClave(col)) {
+                ignoradas.agregar(col);
             }
         }
 
-        return ignoradas.toArray(new String[0]);
+        String[] resultado = new String[ignoradas.tamanio()];
+        for (int i = 0; i < ignoradas.tamanio(); i++) {
+            resultado[i] = ignoradas.obtener(i);
+        }
+        return resultado;
     }
 
     // en orden
     public int[] getIndicesSeleccionados() {
-        List<Integer> indices = new ArrayList<>();
+        ListaDoble<Integer> indices = new ListaDoble<>();
 
         for (String col : todasLasColumnas) {
-            if (columnasSeleccionadas.contains(col)) {
-                indices.add(indiceColumnas.obtener(col));
+            if (columnasSeleccionadas.contieneClave(col)) {
+                indices.agregar(indiceColumnas.obtener(col));
             }
         }
 
-        int[] resultado = new int[indices.size()];
-        for (int i = 0; i < indices.size(); i++) {
-            resultado[i] = indices.get(i);
+        int[] resultado = new int[indices.tamanio()];
+        for (int i = 0; i < indices.tamanio(); i++) {
+            resultado[i] = indices.obtener(i);
         }
         return resultado;
     }
 
     public void seleccionarTodas() {
-        columnasSeleccionadas.clear();
+        columnasSeleccionadas.limpiar();
         for (String col : todasLasColumnas) {
-            columnasSeleccionadas.add(col);
+            columnasSeleccionadas.poner(col, true);
         }
     }
 
     public void ignorarTodas() {
-        columnasSeleccionadas.clear();
+        columnasSeleccionadas.limpiar();
     }
 
     public int getNumeroSeleccionadas() {
-        return columnasSeleccionadas.size();
+        return columnasSeleccionadas.tamanio();
     }
 
     public int getNumeroIgnoradas() {
-        return todasLasColumnas.length - columnasSeleccionadas.size();
+        return todasLasColumnas.length - columnasSeleccionadas.tamanio();
     }
 
     public int getNumeroTotal() {
@@ -154,19 +159,20 @@ public class SelectorColumnas {
 
     // al menos una seleccionada
     public boolean esValido() {
-        return columnasSeleccionadas.size() > 0;
+        return columnasSeleccionadas.tamanio() > 0;
     }
 
     public void imprimir() {
         System.out.println("=== Selector de Columnas ===");
         System.out.println("Total de columnas: " + todasLasColumnas.length);
-        System.out.println("Seleccionadas: " + columnasSeleccionadas.size());
+        System.out.println("Seleccionadas: " + columnasSeleccionadas.tamanio());
         System.out.println("Ignoradas: " + getNumeroIgnoradas());
         System.out.println();
 
         System.out.println("COLUMNAS SELECCIONADAS:");
-        for (String col : columnasSeleccionadas) {
-            System.out.println("  ✓ " + col);
+        ListaDoble<String> clavesSeleccionadas = columnasSeleccionadas.conjuntoClaves();
+        for (int i = 0; i < clavesSeleccionadas.tamanio(); i++) {
+            System.out.println("  ✓ " + clavesSeleccionadas.obtener(i));
         }
 
         String[] ignoradas = getColumnasIgnoradas();
@@ -182,7 +188,7 @@ public class SelectorColumnas {
     @Override
     public String toString() {
         return "SelectorColumnas [total=" + todasLasColumnas.length +
-                ", seleccionadas=" + columnasSeleccionadas.size() +
+                ", seleccionadas=" + columnasSeleccionadas.tamanio() +
                 ", ignoradas=" + getNumeroIgnoradas() + "]";
     }
 }

@@ -2,9 +2,7 @@ package modelo.datos;
 
 import modelo.estructuras.IDiccionario;
 import modelo.estructuras.Vector;
-
-import java.util.ArrayList;
-import java.util.List;
+import modelo.estructuras.ListaDoble;
 
 public class TransformadorDatos {
 
@@ -22,16 +20,17 @@ public class TransformadorDatos {
         this.codificador = new CodificadorCaracteristicas();
     }
 
-    public Vector[] transformar(List<IDiccionario<String, String>> filas) {
-        List<Vector> vectores = new ArrayList<>();
+    public Vector[] transformar(ListaDoble<IDiccionario<String, String>> filas) {
+        ListaDoble<Vector> vectores = new ListaDoble<>();
 
-        for (IDiccionario<String, String> fila : filas) {
+        for (int k = 0; k < filas.tamanio(); k++) { // Changed to indexed loop for ListaDoble
+            IDiccionario<String, String> fila = filas.obtener(k);
             String identificador = fila.obtener(configurador.getColumnaIdentificador());
             if (identificador == null || identificador.isEmpty()) {
                 continue;
             }
 
-            List<Double> datosVector = new ArrayList<>();
+            ListaDoble<Double> datosVector = new ListaDoble<>();
 
             // 1. Columnas numéricas directas
             agregarColumnasNumericas(fila, datosVector);
@@ -49,54 +48,61 @@ public class TransformadorDatos {
             agregarColumnaFecha(fila, datosVector);
 
             // Crear vector
-            double[] datos = datosVector.stream().mapToDouble(Double::doubleValue).toArray();
+            double[] datos = new double[datosVector.tamanio()];
+            for (int i = 0; i < datosVector.tamanio(); i++) {
+                datos[i] = datosVector.obtener(i);
+            }
             Vector v = new Vector(datos, identificador);
-            vectores.add(v);
+            vectores.agregar(v);
         }
 
-        return vectores.toArray(new Vector[0]);
+        Vector[] resultado = new Vector[vectores.tamanio()];
+        for (int i = 0; i < vectores.tamanio(); i++) {
+            resultado[i] = vectores.obtener(i);
+        }
+        return resultado;
     }
 
-    private void agregarColumnasNumericas(IDiccionario<String, String> fila, List<Double> datosVector) {
+    private void agregarColumnasNumericas(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         for (String columna : configurador.getColumnasNumericas()) {
             String valor = fila.obtener(columna);
-            datosVector.add(codificador.parsearNumerico(valor));
+            datosVector.agregar(codificador.parsearNumerico(valor));
         }
     }
 
-    private void agregarColumnasCategoricas(IDiccionario<String, String> fila, List<Double> datosVector) {
+    private void agregarColumnasCategoricas(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         for (String columna : configurador.getColumnasCategoricas()) {
             String valor = fila.obtener(columna);
-            List<String> categorias = extractorCategorias.obtenerCategorias(columna);
+            ListaDoble<String> categorias = extractorCategorias.obtenerCategorias(columna);
 
             if (categorias != null) {
                 double[] oneHot = codificador.codificarOneHot(valor, categorias);
                 for (double val : oneHot) {
-                    datosVector.add(val);
+                    datosVector.agregar(val);
                 }
             }
         }
     }
 
-    private void agregarColumnasConteo(IDiccionario<String, String> fila, List<Double> datosVector) {
+    private void agregarColumnasConteo(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         for (String columna : configurador.getColumnasConteo()) {
             String valor = fila.obtener(columna);
             int conteo = codificador.contarElementos(valor);
-            datosVector.add((double) conteo);
+            datosVector.agregar((double) conteo);
         }
     }
 
-    private void agregarColumnasJsonArray(IDiccionario<String, String> fila, List<Double> datosVector) {
+    private void agregarColumnasJsonArray(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         for (String columna : configurador.getColumnasJsonArray()) {
             String valor = fila.obtener(columna);
             int conteo = codificador.contarElementosJson(valor);
-            datosVector.add((double) conteo);
+            datosVector.agregar((double) conteo);
         }
     }
 
-    private void agregarColumnaFecha(IDiccionario<String, String> fila, List<Double> datosVector) {
+    private void agregarColumnaFecha(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         String fechaStr = fila.obtener(configurador.getColumnaFecha());
         double fechaNormalizada = normalizadorFechas.normalizar(fechaStr);
-        datosVector.add(fechaNormalizada);
+        datosVector.agregar(fechaNormalizada);
     }
 }

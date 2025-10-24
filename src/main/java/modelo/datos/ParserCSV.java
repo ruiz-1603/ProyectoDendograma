@@ -2,24 +2,26 @@ package modelo.datos;
 
 import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
+import modelo.estructuras.ListaDoble;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Responsabilidad: Leer y parsear archivos CSV
+ */
 public class ParserCSV {
 
     private String[] encabezados;
-    private List<IDiccionario<String, String>> filas;
+    private ListaDoble<IDiccionario<String, String>> filas;
 
     public ParserCSV() {
         this.encabezados = new String[0];
-        this.filas = new ArrayList<>();
+        this.filas = new ListaDoble<>();
     }
 
     public void parsear(String rutaArchivo) throws IOException {
-        this.filas.clear();
+        this.filas.limpiar();
 
         try (BufferedReader lector = new BufferedReader(
                 new InputStreamReader(new FileInputStream(rutaArchivo), StandardCharsets.UTF_8))) {
@@ -39,7 +41,7 @@ public class ParserCSV {
                 try {
                     String[] valores = parsearLinea(linea);
                     IDiccionario<String, String> fila = construirFila(valores);
-                    filas.add(fila);
+                    filas.agregar(fila);
                 } catch (Exception e) {
                     System.err.println("Advertencia línea " + numeroLinea + ": " + e.getMessage());
                 }
@@ -49,7 +51,7 @@ public class ParserCSV {
     }
 
     private String[] parsearLinea(String linea) {
-        List<String> campos = new ArrayList<>();
+        ListaDoble<String> campos = new ListaDoble<>();
         StringBuilder campoActual = new StringBuilder();
         boolean dentroComillas = false;
         int i = 0;
@@ -65,7 +67,7 @@ public class ParserCSV {
                     dentroComillas = !dentroComillas;
                 }
             } else if (c == ',' && !dentroComillas) {
-                campos.add(campoActual.toString());
+                campos.agregar(campoActual.toString());
                 campoActual = new StringBuilder();
             } else {
                 campoActual.append(c);
@@ -74,8 +76,14 @@ public class ParserCSV {
             i++;
         }
 
-        campos.add(campoActual.toString());
-        return campos.toArray(new String[0]);
+        campos.agregar(campoActual.toString());
+
+        // Convertir ListaDoble a array
+        String[] resultado = new String[campos.tamanio()];
+        for (int j = 0; j < campos.tamanio(); j++) {
+            resultado[j] = campos.obtener(j);
+        }
+        return resultado;
     }
 
     private IDiccionario<String, String> construirFila(String[] valores) {
@@ -85,7 +93,7 @@ public class ParserCSV {
             fila.poner(encabezados[i].trim(), valores[i].trim());
         }
 
-        // rellenar con vacios si faltan columnas
+        // Rellenar con vacíos si faltan columnas
         for (int i = valores.length; i < encabezados.length; i++) {
             fila.poner(encabezados[i].trim(), "");
         }
@@ -97,11 +105,11 @@ public class ParserCSV {
         return encabezados.clone();
     }
 
-    public List<IDiccionario<String, String>> getFilas() {
-        return new ArrayList<>(filas);
+    public ListaDoble<IDiccionario<String, String>> getFilas() {
+        return filas;
     }
 
     public int getNumeroFilas() {
-        return filas.size();
+        return filas.tamanio();
     }
 }
