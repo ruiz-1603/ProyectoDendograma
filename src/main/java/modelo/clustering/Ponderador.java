@@ -1,6 +1,5 @@
 package modelo.clustering;
 
-import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 
 public class Ponderador {

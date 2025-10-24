@@ -10,7 +10,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import modelo.datos.CargadorCSV;
-import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
 import modelo.estructuras.Dendograma;
@@ -29,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ControladorPrincipal {
 
