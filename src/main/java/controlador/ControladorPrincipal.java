@@ -136,7 +136,7 @@ public class ControladorPrincipal {
     @FXML
     private void onConfigurarPesos() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/pantalla-pesos.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/vista/pantalla-pesos.fxml"));
             Scene scene = new Scene(loader.load());
 
             Stage stage = new Stage();
@@ -168,7 +168,7 @@ public class ControladorPrincipal {
     @FXML
     private void onSeleccionarVariables() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/pantalla-variables.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/example/vista/pantalla-variables.fxml"));
             Scene scene = new Scene(loader.load());
 
             Stage stage = new Stage();
