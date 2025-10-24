@@ -1,6 +1,6 @@
 package modelo.estructuras;
 
-public class Dendograma {
+public class Dendrograma {
     public String toJSON(Nodo raiz) {
         return toJSONRec(raiz,0);
     }

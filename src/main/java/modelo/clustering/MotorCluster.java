@@ -175,7 +175,7 @@ public class MotorCluster {
     }
 
     public void imprimirDendrograma(Nodo raiz) {
-        Dendograma dendo = new Dendograma();
+        Dendrograma dendo = new Dendrograma();
         System.out.println("=== Dendrograma ===");
         System.out.println("Tipo de enlace: " + getTipoEnlace());
         System.out.println("Distancias de fusión: " + obtenerNumeroFusiones());

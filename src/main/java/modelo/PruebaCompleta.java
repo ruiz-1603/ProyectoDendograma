@@ -4,7 +4,7 @@ import modelo.datos.CargadorCSV;
 import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
-import modelo.estructuras.Dendograma;
+import modelo.estructuras.Dendrograma;
 import modelo.normalizacion.Normalizador;
 import modelo.normalizacion.FactoryNormalizacion;
 import modelo.distancias.CalculadorMatrizDistancia;
@@ -29,7 +29,7 @@ public class PruebaCompleta {
         CalculadorMatrizDistancia calculador = null;
         Nodo raiz = null;
         MotorCluster motor = null;
-        Dendograma dendograma = new Dendograma();
+        Dendrograma dendrograma = new Dendrograma();
 
         try {
             // PASO 1: Cargar CSV
@@ -109,15 +109,15 @@ public class PruebaCompleta {
             // PASO 6: Información del dendrograma
             System.out.println("PASO 6: Análisis del dendrograma...");
             System.out.println("─".repeat(70));
-            System.out.println("Altura del árbol: " + dendograma.altura(raiz));
-            System.out.println("Número de hojas: " + dendograma.contarHojas(raiz));
+            System.out.println("Altura del árbol: " + dendrograma.altura(raiz));
+            System.out.println("Número de hojas: " + dendrograma.contarHojas(raiz));
             System.out.println("Número de fusiones: " + motor.obtenerNumeroFusiones());
             System.out.println();
 
             // PASO 7: Exportar a JSON
             System.out.println("PASO 7: Generando JSON del dendrograma...");
             System.out.println("─".repeat(70));
-            String json = dendograma.toJSON(raiz);
+            String json = dendrograma.toJSON(raiz);
             System.out.println("JSON (primeros 500 caracteres):");
             System.out.println(json.substring(0, Math.min(500, json.length())) + "...");
 
@@ -127,13 +127,13 @@ public class PruebaCompleta {
             // PASO 8: Probar diferentes distancias
             System.out.println("PASO 8: Probando diferentes distancias...");
             System.out.println("─".repeat(70));
-            probarDiferentesDistancias(vectoresNormalizados, dendograma);
+            probarDiferentesDistancias(vectoresNormalizados, dendrograma);
             System.out.println();
 
             // PASO 9: Probar diferentes tipos de enlace
             System.out.println("PASO 9: Probando diferentes tipos de enlace...");
             System.out.println("─".repeat(70));
-            probarDiferentesEnlaces(vectoresNormalizados, dendograma);
+            probarDiferentesEnlaces(vectoresNormalizados, dendrograma);
             System.out.println();
 
             // PASO 10: Resumen
@@ -148,7 +148,7 @@ public class PruebaCompleta {
             System.out.println("  4. Ponderación → " + (ponderador.tienePonderacion() ? "Activa" : "Sin ponderación"));
             System.out.println("  5. Normalización → Min-Max aplicado");
             System.out.println("  6. Distancia → Euclidiana con " + calculador.getNumeroVectores() + " elementos");
-            System.out.println("  7. Clustering → Dendrograma con altura " + dendograma.altura(raiz));
+            System.out.println("  7. Clustering → Dendrograma con altura " + dendrograma.altura(raiz));
             System.out.println("  8. JSON → Exportado a dendrograma.json");
 
         } catch (Exception e) {
@@ -175,7 +175,7 @@ public class PruebaCompleta {
     /**
      * Prueba el sistema con diferentes métricas de distancia
      */
-    private static void probarDiferentesDistancias(Vector[] vectores, Dendograma dendograma) {
+    private static void probarDiferentesDistancias(Vector[] vectores, Dendrograma dendrograma) {
         FactoryDistancia.TipoDistancia[] distancias = {
                 FactoryDistancia.TipoDistancia.EUCLIDIANA,
                 FactoryDistancia.TipoDistancia.MANHATTAN,
@@ -193,7 +193,7 @@ public class PruebaCompleta {
                 double distanciaMax = encontrarMaximo(distanciasFusion);
 
                 System.out.printf("  %-12s → Altura: %2d | Dist.Máx: %8.4f | ✓ OK%n",
-                        distancia.toString(), dendograma.altura(raiz), distanciaMax);
+                        distancia.toString(), dendrograma.altura(raiz), distanciaMax);
             } catch (Exception e) {
                 System.out.printf("  %-12s → ✗ Error: %s%n",
                         distancia.toString(), e.getMessage());
@@ -204,7 +204,7 @@ public class PruebaCompleta {
     /**
      * Prueba el sistema con diferentes tipos de enlace
      */
-    private static void probarDiferentesEnlaces(Vector[] vectores, Dendograma dendograma) {
+    private static void probarDiferentesEnlaces(Vector[] vectores, Dendrograma dendrograma) {
         MotorCluster.TipoEnlace[] enlaces = {
                 MotorCluster.TipoEnlace.MINIMO,
                 MotorCluster.TipoEnlace.MAXIMO,
@@ -222,7 +222,7 @@ public class PruebaCompleta {
                 double distanciaMax = encontrarMaximo(distanciasFusion);
 
                 System.out.printf("  %-10s → Altura: %2d | Dist.Máx: %8.4f | ✓ OK%n",
-                        enlace.toString(), dendograma.altura(raiz), distanciaMax);
+                        enlace.toString(), dendrograma.altura(raiz), distanciaMax);
             } catch (Exception e) {
                 System.out.printf("  %-10s → ✗ Error: %s%n",
                         enlace.toString(), e.getMessage());

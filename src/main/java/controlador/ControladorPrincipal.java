@@ -13,7 +13,7 @@ import modelo.datos.CargadorCSV;
 import modelo.datos.SelectorColumnas;
 import modelo.estructuras.Vector;
 import modelo.estructuras.Nodo;
-import modelo.estructuras.Dendograma;
+import modelo.estructuras.Dendrograma;
 import modelo.estructuras.ListaDoble;
 import modelo.normalizacion.Normalizador;
 import modelo.normalizacion.FactoryNormalizacion;
@@ -53,7 +53,7 @@ public class ControladorPrincipal {
     private Ponderador ponderador;
     private Vector[] vectores;
     private Nodo dendrogramaRaiz;
-    private Dendograma dendograma;
+    private Dendrograma dendrograma;
     private File archivoCSV;
     private String reportePrincipalCache = "";
 
@@ -80,7 +80,7 @@ public class ControladorPrincipal {
         progressBar.setVisible(false);
         lblEstado.setText("Esperando carga de archivo CSV...");
 
-        dendograma = new Dendograma();
+        dendrograma = new Dendrograma();
     }
 
     @FXML
@@ -244,8 +244,8 @@ public class ControladorPrincipal {
                             "Normalización: " + cmbNormalizacion.getValue() + "\n" +
                             "Distancia: " + cmbDistancia.getValue() + "\n" +
                             "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
-                            "Altura del árbol: " + dendograma.altura(dendrogramaRaiz) + "\n" +
-                            "Hojas: " + dendograma.contarHojas(dendrogramaRaiz) + "\n" +
+                            "Altura del árbol: " + dendrograma.altura(dendrogramaRaiz) + "\n" +
+                            "Hojas: " + dendrograma.contarHojas(dendrogramaRaiz) + "\n" +
                             "Distancia máx. de fusión: " + String.format("%.4f", dendrogramaRaiz.getDistancia()) + "\n" +
                             "Fusiones: " + motor.obtenerNumeroFusiones());
 
@@ -255,7 +255,7 @@ public class ControladorPrincipal {
 
                     if (k > 1 && dendrogramaRaiz != null) {
                         try {
-                            ListaDoble<Nodo> clusters = dendograma.cortarArbol(dendrogramaRaiz, k);
+                            ListaDoble<Nodo> clusters = dendrograma.cortarArbol(dendrogramaRaiz, k);
                             for (int i = 0; i < clusters.tamanio(); i++) {
                                 clustersParaColorear.add(clusters.obtener(i));
                             }
@@ -308,7 +308,7 @@ public class ControladorPrincipal {
                 return;
             }
 
-            ListaDoble<Nodo> clustersLista = dendograma.cortarPorDistancia(dendrogramaRaiz, umbral);
+            ListaDoble<Nodo> clustersLista = dendrograma.cortarPorDistancia(dendrogramaRaiz, umbral);
             List<Nodo> clusters = new ArrayList<>();
             for (int i = 0; i < clustersLista.tamanio(); i++) {
                 clusters.add(clustersLista.obtener(i));
@@ -332,9 +332,9 @@ public class ControladorPrincipal {
         sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
         for (int i = 0; i < clusters.size(); i++) {
             Nodo cluster = clusters.get(i);
-            sb.append("Cluster ").append(i + 1).append(" (").append(dendograma.contarHojas(cluster)).append(" miembros):\n");
+            sb.append("Cluster ").append(i + 1).append(" (").append(dendrograma.contarHojas(cluster)).append(" miembros):\n");
 
-            String[] etiquetas = dendograma.obtenerEtiquetasHojas(cluster);
+            String[] etiquetas = dendrograma.obtenerEtiquetasHojas(cluster);
             sb.append("  ").append(String.join(", ", etiquetas)).append("\n\n");
         }
         return sb.toString();
@@ -359,7 +359,7 @@ public class ControladorPrincipal {
 
         if (archivo != null) {
             try (FileWriter writer = new FileWriter(archivo)) {
-                String json = dendograma.toJSON(dendrogramaRaiz);
+                String json = dendrograma.toJSON(dendrogramaRaiz);
                 writer.write(json);
                 mostrarInformacion("Exportación exitosa",
                         "JSON guardado en:\n" + archivo.getAbsolutePath());
