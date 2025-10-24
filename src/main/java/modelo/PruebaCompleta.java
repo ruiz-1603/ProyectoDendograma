@@ -11,6 +11,7 @@ import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
 import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
+import modelo.estructuras.ListaDoble;
 
 
 // PRUEBA DEL DENDROGRAMA
