@@ -13,7 +13,6 @@ import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
 import modelo.estructuras.ListaDoble;
 
-
 // PRUEBA DEL DENDROGRAMA
 // Pipeline: CSV → Vectores → Ponderación → Normalización → Distancias → Clustering → Dendrograma → JSON
 public class PruebaCompleta {
@@ -37,7 +36,7 @@ public class PruebaCompleta {
             System.out.println("PASO 1: Cargando datos desde CSV...");
             System.out.println("─".repeat(70));
             cargador = new CargadorCSV();
-            cargador.cargar("src/main/resources/movie_dataset.csv"); // Cambiar ruta según tu setup
+            cargador.cargar("src/main/resources/movie_dataset.csv");
             cargador.imprimirEstadisticas();
             System.out.println();
 
@@ -59,8 +58,6 @@ public class PruebaCompleta {
             System.out.println("PASO 2.5: Configurando selector de columnas...");
             System.out.println("─".repeat(70));
             selector = new SelectorColumnas(cargador.getNombresDimensiones());
-            // Ejemplo: ignorar algunas columnas (comentar/descomentar según necesites)
-            // selector.ignorar("genres_conteo");
             selector.imprimir();
             System.out.println();
 
@@ -69,11 +66,8 @@ public class PruebaCompleta {
             System.out.println("─".repeat(70));
             double[] pesos = new double[cargador.getDimensiones()];
             for (int i = 0; i < pesos.length; i++) {
-                pesos[i] = 1.0;  // Peso por defecto = 1.0 (sin ponderación)
+                pesos[i] = 1.0;
             }
-            // Ejemplo: asignar pesos diferentes (comentar/descomentar según necesites)
-            // pesos[0] = 2.0;  // Duplicar peso del budget
-            // pesos[1] = 0.5;  // Reducir peso de popularity
 
             ponderador = new Ponderador(pesos, cargador.getNombresDimensiones());
             ponderador.imprimir();
@@ -127,7 +121,6 @@ public class PruebaCompleta {
             System.out.println("JSON (primeros 500 caracteres):");
             System.out.println(json.substring(0, Math.min(500, json.length())) + "...");
 
-            // Guardar JSON a archivo
             guardarJsonAArchivo(json, "dendrograma.json");
             System.out.println();
 
@@ -195,10 +188,9 @@ public class PruebaCompleta {
                 MotorCluster motor = new MotorCluster();
                 Nodo raiz = motor.construirDendrograma(vectores, distancia);
 
-                double distanciaMax = motor.obtenerDistanciasFusion().stream()
-                        .mapToDouble(Double::doubleValue)
-                        .max()
-                        .orElse(0);
+                // Encontrar distancia máxima usando ListaDoble
+                ListaDoble<Double> distanciasFusion = motor.obtenerDistanciasFusion();
+                double distanciaMax = encontrarMaximo(distanciasFusion);
 
                 System.out.printf("  %-12s → Altura: %2d | Dist.Máx: %8.4f | ✓ OK%n",
                         distancia.toString(), dendograma.altura(raiz), distanciaMax);
@@ -225,10 +217,9 @@ public class PruebaCompleta {
                 MotorCluster motor = new MotorCluster(enlace);
                 Nodo raiz = motor.construirDendrograma(vectores, FactoryDistancia.TipoDistancia.EUCLIDIANA);
 
-                double distanciaMax = motor.obtenerDistanciasFusion().stream()
-                        .mapToDouble(Double::doubleValue)
-                        .max()
-                        .orElse(0);
+                // Encontrar distancia máxima usando ListaDoble
+                ListaDoble<Double> distanciasFusion = motor.obtenerDistanciasFusion();
+                double distanciaMax = encontrarMaximo(distanciasFusion);
 
                 System.out.printf("  %-10s → Altura: %2d | Dist.Máx: %8.4f | ✓ OK%n",
                         enlace.toString(), dendograma.altura(raiz), distanciaMax);
@@ -237,5 +228,23 @@ public class PruebaCompleta {
                         enlace.toString(), e.getMessage());
             }
         }
+    }
+
+    /**
+     * Encuentra el máximo en una ListaDoble de Double
+     */
+    private static double encontrarMaximo(ListaDoble<Double> lista) {
+        if (lista.tamanio() == 0) {
+            return 0.0;
+        }
+
+        double max = lista.obtener(0);
+        for (int i = 1; i < lista.tamanio(); i++) {
+            double actual = lista.obtener(i);
+            if (actual > max) {
+                max = actual;
+            }
+        }
+        return max;
     }
 }
