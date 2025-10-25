@@ -56,9 +56,9 @@ public class DendrogramaDrawer {
         Diccionario<Nodo, Color> mapaColores = new Diccionario<>();
 
         if (clustersParaColorear == null || clustersParaColorear.tamanio() == 0) {
-            colorearSubarbol(raiz, Color.BLACK, mapaColores);
+            colorearSubarbol(raiz, Color.WHITE, mapaColores);
         } else {
-            colorearSubarbol(raiz, Color.BLACK, mapaColores); // Comenzar con todo negro
+            colorearSubarbol(raiz, Color.WHITE, mapaColores); // Comenzar con todo negro
             for (int i = 0; i < clustersParaColorear.tamanio(); i++) {
                 Nodo raizCluster = clustersParaColorear.obtener(i);
                 Color color = COLORES[i % COLORES.length];
@@ -92,7 +92,7 @@ public class DendrogramaDrawer {
         if (nodo == null) return;
 
         Point2D posicion = posiciones.obtener(nodo);
-        Color color = mapaColores.contieneClave(nodo) ? mapaColores.obtener(nodo) : Color.BLACK;
+        Color color = mapaColores.contieneClave(nodo) ? mapaColores.obtener(nodo) : Color.WHITE;
 
         if (nodo.esHoja()) {
             // Obtener las etiquetas de la hoja
@@ -127,9 +127,9 @@ public class DendrogramaDrawer {
             lineaHorizontal.setStrokeWidth(1.5);
 
             Color colorIzquierdo = mapaColores.contieneClave(nodo.getIzquierdo()) ?
-                    mapaColores.obtener(nodo.getIzquierdo()) : Color.BLACK;
+                    mapaColores.obtener(nodo.getIzquierdo()) : Color.WHITE;
             Color colorDerecho = mapaColores.contieneClave(nodo.getDerecho()) ?
-                    mapaColores.obtener(nodo.getDerecho()) : Color.BLACK;
+                    mapaColores.obtener(nodo.getDerecho()) : Color.WHITE;
 
             Line lineaVerticalIzquierda = new Line(posicionIzquierda.getX(), posicionIzquierda.getY(), posicionIzquierda.getX(), posicion.getY());
             lineaVerticalIzquierda.setStroke(colorIzquierdo);
