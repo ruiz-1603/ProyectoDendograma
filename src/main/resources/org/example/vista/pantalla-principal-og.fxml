@@ -16,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane style="-fx-background-color: #3D3A3A;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorPrincipal">
+<AnchorPane stylesheets="@../style/main.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorPrincipal">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3d3a3a" height="124.0" layoutX="23.0" layoutY="466.0" stroke="WHITE" width="282.0" />
       <Line endX="80.171875" endY="-1.0" layoutX="35.0" layoutY="467.0" startX="1.0" startY="-1.0" stroke="#3d3a3a" strokeWidth="3.0" />
@@ -33,7 +33,7 @@
          <font>
             <Font name="Consolas" size="16.0" />
          </font></Label>
-      <Button fx:id="btnCargarCSV" contentDisplay="GRAPHIC_ONLY" layoutX="46.0" layoutY="100.0" mnemonicParsing="false" onAction="#onCargarCSV" style="-fx-border-color: #309742; -fx-background-color: #3D3A3A; -fx-border-radius: 4px;" text="Cargar archivo">
+      <Button fx:id="btnCargarCSV" contentDisplay="GRAPHIC_ONLY" layoutX="46.0" layoutY="100.0" mnemonicParsing="false" onAction="#onCargarCSV" style="-fx-background-color: #3d3a3a; -fx-border-color: #309742;" text="Cargar archivo">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>
@@ -97,14 +97,14 @@
             <Cursor fx:constant="HAND" />
          </cursor></TextField>
 
-      <Button fx:id="btnConfigurarPesos" contentDisplay="CENTER" layoutX="38.0" layoutY="365.0" mnemonicParsing="false" onAction="#onConfigurarPesos" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Pesos" textFill="WHITE">
+      <Button fx:id="btnConfigurarPesos" contentDisplay="CENTER" layoutX="38.0" layoutY="365.0" mnemonicParsing="false" onAction="#onConfigurarPesos" prefHeight="25.0" prefWidth="245.0" text="Pesos" textFill="WHITE">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="btnSeleccionarVariables" layoutX="38.0" layoutY="401.0" mnemonicParsing="false" onAction="#onSeleccionarVariables" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Variables" textFill="WHITE">
+      <Button fx:id="btnSeleccionarVariables" layoutX="38.0" layoutY="401.0" mnemonicParsing="false" onAction="#onSeleccionarVariables" prefHeight="25.0" prefWidth="245.0" text="Variables" textFill="WHITE">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>
@@ -116,14 +116,14 @@
          <font>
             <Font name="Consolas" size="16.0" />
          </font></Label>
-      <Button fx:id="btnEjecutar" layoutX="38.0" layoutY="486.0" mnemonicParsing="false" onAction="#onEjecutar" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Ejecutar" textFill="WHITE">
+      <Button fx:id="btnEjecutar" layoutX="38.0" layoutY="486.0" mnemonicParsing="false" onAction="#onEjecutar" prefHeight="25.0" prefWidth="245.0" text="Ejecutar" textFill="WHITE">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor></Button>
-      <Button fx:id="btnExportarJSON" layoutX="38.0" layoutY="525.0" minHeight="25.0" minWidth="245.0" mnemonicParsing="false" onAction="#onExportarJSON" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Exportar JSON" textFill="WHITE">
+      <Button fx:id="btnExportarJSON" layoutX="38.0" layoutY="525.0" minHeight="25.0" minWidth="245.0" mnemonicParsing="false" onAction="#onExportarJSON" text="Exportar JSON" textFill="WHITE">
          <font>
             <Font name="Consolas" size="12.0" />
          </font>

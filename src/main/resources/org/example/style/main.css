@@ -1,0 +1,38 @@
+.root {
+    -fx-background-color: #3D3A3A;
+}
+
+.label {
+    -fx-text-fill: white;
+    -fx-font-family: "Consolas";
+}
+
+.button {
+    -fx-background-color: #227A22;
+    -fx-border-color: #ffffff;
+    -fx-border-radius: 4px;
+    -fx-text-fill: white;
+    -fx-font-family: "Consolas";
+}
+
+.button:hover {
+    -fx-background-color: #309742;
+}
+
+#vboxVariables {
+    -fx-background-color: #3D3A3A;
+}
+
+.check-box {
+    -fx-text-fill: white;
+}
+
+.check-box .box {
+    -fx-background-color: #3D3A3A;
+    -fx-border-color: white;
+    -fx-border-radius: 3px;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
