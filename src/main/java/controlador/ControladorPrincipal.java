@@ -42,7 +42,7 @@ public class ControladorPrincipal {
     @FXML private Button btnSeleccionarVariables;
     @FXML private Button btnEjecutar;
     @FXML private Button btnExportarJSON;
-    @FXML private ProgressBar progressBar;
+    
     @FXML private Label lblEstado;
 
     private CargadorCSV cargador;
@@ -74,14 +74,13 @@ public class ControladorPrincipal {
         btnEjecutar.setDisable(true);
         btnExportarJSON.setDisable(true);
 
-        progressBar.setVisible(false);
         lblEstado.setText("Esperando carga de archivo CSV...");
 
         dendrograma = new Dendrograma();
     }
 
     @FXML
-    private void onCargarCSV() {
+    public void onCargarCSV() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Seleccionar archivo CSV");
         fileChooser.getExtensionFilters().add(
@@ -99,7 +98,7 @@ public class ControladorPrincipal {
     private void cargarArchivo(File archivo) {
         try {
             lblEstado.setText("Cargando archivo CSV...");
-            progressBar.setVisible(true);
+
 
             cargador = new CargadorCSV();
             cargador.cargar(archivo.getAbsolutePath());
@@ -124,11 +123,9 @@ public class ControladorPrincipal {
             spinnerClusters.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, vectores.length, 1));
 
             lblEstado.setText("Listo para ejecutar clustering");
-            progressBar.setVisible(false);
 
         } catch (IOException e) {
             mostrarError("Error al cargar CSV", e.getMessage());
-            progressBar.setVisible(false);
         }
     }
 
@@ -214,7 +211,7 @@ public class ControladorPrincipal {
             try {
                 javafx.application.Platform.runLater(() -> {
                     lblEstado.setText("Ejecutando clustering...");
-                    progressBar.setVisible(true);
+        
                     btnEjecutar.setDisable(true);
                     txtDistanciaUmbral.setDisable(true);
                     txtDistanciaUmbral.clear();
@@ -265,7 +262,7 @@ public class ControladorPrincipal {
                     DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersParaColorear);
 
                     lblEstado.setText("Clustering completado");
-                    progressBar.setVisible(false);
+                    
                     btnEjecutar.setDisable(false);
                     btnExportarJSON.setDisable(false);
                     txtDistanciaUmbral.setDisable(false);
@@ -275,7 +272,7 @@ public class ControladorPrincipal {
                 javafx.application.Platform.runLater(() -> {
                     mostrarError("Error en clustering", e.getMessage());
                     lblEstado.setText("Error en clustering");
-                    progressBar.setVisible(false);
+                    
                     btnEjecutar.setDisable(false);
                     e.printStackTrace();
                 });

@@ -1,63 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="controlador.ControladorPrincipal">
+<Pane style="-fx-background-color: #3D3A3A;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorPrincipal">
    <children>
-      <Text layoutX="33.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sistema de Dendrograma y Clustering Jerárquico" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3d3a3a" height="124.0" layoutX="23.0" layoutY="466.0" stroke="WHITE" width="282.0" />
+      <Line endX="80.171875" endY="-1.0" layoutX="35.0" layoutY="467.0" startX="1.0" startY="-1.0" stroke="#3d3a3a" strokeWidth="3.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3d3a3a" height="283.0" layoutX="23.0" layoutY="164.0" stroke="WHITE" width="281.0" />
+      <Line endX="86.33333587646484" endY="-1.0" layoutX="41.0" layoutY="165.0" startX="-7.0" startY="-1.0" stroke="#3d3a3a" strokeWidth="3.0" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3d3a3a" height="63.0" layoutX="23.0" layoutY="81.0" stroke="WHITE" width="281.0" />
+      <Line endX="81.96875" endY="-1.0" layoutX="43.0" layoutY="82.0" startX="-7.0" startY="-1.0" stroke="#3d3a3a" strokeWidth="3.0" />
+      <Text fill="#309742" layoutX="57.0" layoutY="48.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Dendrograma">
+         <font>
+            <Font name="Consolas Bold" size="36.0" />
+         </font></Text>
 
-      <Label layoutX="33.0" layoutY="70.0" text="1. Cargar Datos" />
-      <Button fx:id="btnCargarCSV" layoutX="44.0" layoutY="90.0" mnemonicParsing="false" text="Cargar archivo" onAction="#onCargarCSV" />
-      <Label fx:id="lblArchivoSeleccionado" layoutX="150.0" layoutY="94.0" text="Ningún archivo seleccionado" />
+      <Label layoutX="37.0" layoutY="72.0" text="Cargar CSV" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="16.0" />
+         </font></Label>
+      <Button fx:id="btnCargarCSV" contentDisplay="GRAPHIC_ONLY" layoutX="46.0" layoutY="100.0" mnemonicParsing="false" onAction="#onCargarCSV" style="-fx-border-color: #309742; -fx-background-color: #3D3A3A; -fx-border-radius: 4px;" text="Cargar archivo">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="22.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icons/folder.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Label fx:id="lblArchivoSeleccionado" layoutX="95.0" layoutY="109.0" text="Ningún archivo seleccionado" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
 
-      <Label layoutX="33.0" layoutY="140.0" text="2. Configuración del Clustering" />
-      <Label layoutX="33.0" layoutY="170.0" text="Normalización:" />
-      <ComboBox fx:id="cmbNormalizacion" layoutX="123.0" layoutY="166.0" prefHeight="25.0" prefWidth="127.0" />
-      <Label layoutX="38.0" layoutY="200.0" text="Funciones:" />
-      <ComboBox fx:id="cmbDistancia" layoutX="117.0" layoutY="196.0" prefHeight="25.0" prefWidth="133.0" />
-      <Label layoutX="36.0" layoutY="230.0" text="Tipo de enlace:" />
-      <ComboBox fx:id="cmbTipoEnlace" layoutX="134.0" layoutY="226.0" prefHeight="25.0" prefWidth="119.0" />
-      <Label layoutX="43.0" layoutY="260.0" text="Número de clusters:" />
-      <Spinner fx:id="spinnerClusters" layoutX="163.0" layoutY="256.0" prefHeight="25.0" prefWidth="58.0" />
-      <Label layoutX="45.0" layoutY="290.0" text="Distancia de umbral:" />
-      <TextField fx:id="txtDistanciaUmbral" layoutX="175.0" layoutY="286.0" prefHeight="25.0" prefWidth="69.0" onAction="#onAplicarCorteDistancia" promptText="Ej: 1.25" />
+      <Label layoutX="37.0" layoutY="155.0" text="Clustering" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="16.0" />
+         </font></Label>
+      <Label layoutX="37.0" layoutY="191.0" text="Normalización:" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <ComboBox fx:id="cmbNormalizacion" layoutX="156.0" layoutY="186.0" prefHeight="25.0" prefWidth="127.0" style="-fx-background-color: #3D3A3A; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;" stylesheets="@../style/comboBox.css">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
+      <Label layoutX="37.0" layoutY="226.0" text="Funciones:" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <ComboBox fx:id="cmbDistancia" layoutX="156.0" layoutY="222.0" prefHeight="25.0" prefWidth="127.0" style="-fx-background-color: #3D3A3A; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;" stylesheets="@../style/comboBox.css">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
+      <Label layoutX="37.0" layoutY="262.0" text="Tipo de enlace:" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <ComboBox fx:id="cmbTipoEnlace" layoutX="156.0" layoutY="256.0" prefHeight="25.0" prefWidth="127.0" style="-fx-background-color: #3D3A3A; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;" stylesheets="@../style/comboBox.css">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></ComboBox>
+      <Label layoutX="38.0" layoutY="297.0" text="Número de clusters:" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <Spinner fx:id="spinnerClusters" layoutX="214.0" layoutY="291.0" prefHeight="25.0" prefWidth="69.0" style="-fx-background-color: #3D3A3A;" stylesheets="@../style/spinner.css">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Spinner>
+      <Label layoutX="38.0" layoutY="332.0" text="Distancia de umbral:" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <TextField fx:id="txtDistanciaUmbral" layoutX="214.0" layoutY="326.0" onAction="#onAplicarCorteDistancia" prefHeight="25.0" prefWidth="69.0" style="-fx-background-color: #3D3A3A; -fx-border-color: #ffffff; -fx-text-fill: #ffffff;">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></TextField>
 
-      <Button fx:id="btnConfigurarPesos" layoutX="39.0" layoutY="330.0" mnemonicParsing="false" text="Configurar pesos" onAction="#onConfigurarPesos" />
-      <Button fx:id="btnSeleccionarVariables" layoutX="168.0" layoutY="330.0" mnemonicParsing="false" text="Seleccionar variables" onAction="#onSeleccionarVariables" />
+      <Button fx:id="btnConfigurarPesos" contentDisplay="CENTER" layoutX="38.0" layoutY="365.0" mnemonicParsing="false" onAction="#onConfigurarPesos" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Pesos" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button fx:id="btnSeleccionarVariables" layoutX="38.0" layoutY="401.0" mnemonicParsing="false" onAction="#onSeleccionarVariables" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Variables" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
 
-      <Label layoutX="33.0" layoutY="380.0" text="3. Ejecutar Clustering" />
-      <Button fx:id="btnEjecutar" layoutX="47.0" layoutY="400.0" mnemonicParsing="false" text="Ejecutar" onAction="#onEjecutar" />
-      <Button fx:id="btnExportarJSON" layoutX="120.0" layoutY="400.0" mnemonicParsing="false" text="Exportar JSON" onAction="#onExportarJSON" />
-      <ProgressBar fx:id="progressBar" layoutX="33.0" layoutY="440.0" prefWidth="220.0" progress="0.0" />
-      <Label fx:id="lblEstado" layoutX="33.0" layoutY="460.0" text="Estado: Listo" />
-
-      <Label layoutX="324.0" layoutY="30.0" text="4. Resultados" />
-      <TabPane fx:id="tabPaneResultados" layoutX="324.0" layoutY="50.0" prefHeight="560.0" prefWidth="690.0" tabClosingPolicy="UNAVAILABLE">
+      <Label layoutX="36.0" layoutY="457.0" text="Ejecución" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="16.0" />
+         </font></Label>
+      <Button fx:id="btnEjecutar" layoutX="38.0" layoutY="486.0" mnemonicParsing="false" onAction="#onEjecutar" prefHeight="25.0" prefWidth="245.0" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Ejecutar" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Button fx:id="btnExportarJSON" layoutX="38.0" layoutY="525.0" minHeight="25.0" minWidth="245.0" mnemonicParsing="false" onAction="#onExportarJSON" style="-fx-background-color: #227A22; -fx-border-color: #ffffff; -fx-border-radius: 4px;" text="Exportar JSON" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <Label fx:id="lblEstado" layoutX="38.0" layoutY="562.0" text="Estado: Listo" textFill="WHITE">
+         <font>
+            <Font name="Consolas" size="12.0" />
+         </font></Label>
+      <TabPane fx:id="tabPaneResultados" layoutX="324.0" prefHeight="610.0" prefWidth="690.0" style="-fx-background-color: #3D3A3A;" tabClosingPolicy="UNAVAILABLE">
         <tabs>
           <Tab text="Gráfico Dendrograma">
             <content>
-              <ScrollPane prefHeight="200.0" prefWidth="200.0">
+              <ScrollPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #3D3A3A;">
                      <content>
-                        <Pane fx:id="paneDendrograma" prefHeight="520.0" prefWidth="680.0" />
+                        <Pane fx:id="paneDendrograma" prefHeight="582.0" prefWidth="702.0" style="-fx-background-color: #3D3A3A;" />
                      </content>
               </ScrollPane>
             </content>
           </Tab>
           <Tab text="Resultado en Texto">
             <content>
-              <TextArea fx:id="txtResultado" editable="false" wrapText="true" prefHeight="520.0" prefWidth="680.0" />
+              <TextArea fx:id="txtResultado" editable="false" prefHeight="520.0" prefWidth="680.0" wrapText="true" />
             </content>
           </Tab>
         </tabs>

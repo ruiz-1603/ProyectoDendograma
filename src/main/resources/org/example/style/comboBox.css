@@ -1,0 +1,22 @@
+
+.combo-box {
+    -fx-text-fill: #ffffff;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #3d3a3a;
+}
+
+.combo-box .list-cell:hover {
+    -fx-text-fill: #ffffff;
+    -fx-cursor: hand;
+}
+
+.combo-box .list-cell:selected {
+    -fx-text-fill: #ffffff;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #227A22;
+}
