@@ -35,7 +35,7 @@ public class ControladorPrincipal {
     @FXML private ComboBox<String> cmbTipoEnlace;
     @FXML private Spinner<Integer> spinnerClusters;
     @FXML private TextField txtDistanciaUmbral;
-    @FXML private TextArea txtResultado;
+    
     @FXML private Pane paneDendrograma;
     @FXML private Button btnCargarCSV;
     @FXML private Button btnConfigurarPesos;
@@ -52,7 +52,7 @@ public class ControladorPrincipal {
     private Nodo dendrogramaRaiz;
     private Dendrograma dendrograma;
     private File archivoCSV;
-    private String reportePrincipalCache = "";
+    
 
     @FXML
     public void initialize() {
@@ -114,7 +114,7 @@ public class ControladorPrincipal {
             ponderador = new Ponderador(pesos, cargador.getNombresDimensiones());
 
             lblArchivoSeleccionado.setText(archivo.getName());
-            actualizarTextoResultadoCarga();
+
 
             btnConfigurarPesos.setDisable(false);
             btnSeleccionarVariables.setDisable(false);
@@ -185,7 +185,7 @@ public class ControladorPrincipal {
                 selector.ignorarTodas();
                 selector.seleccionarMultiples(controller.getColumnasSeleccionadas());
                 lblEstado.setText("Selección de variables actualizada.");
-                actualizarTextoResultadoCarga();
+    
             }
 
         } catch (IOException e) {
@@ -234,31 +234,16 @@ public class ControladorPrincipal {
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
 
                 javafx.application.Platform.runLater(() -> {
-                    StringBuilder resultado = new StringBuilder("✓ Clustering completado exitosamente\n" +
-                            "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                            "Variables usadas: " + selector.getNumeroSeleccionadas() + " de " + selector.getNumeroTotal() + "\n" +
-                            "Normalización: " + cmbNormalizacion.getValue() + "\n" +
-                            "Distancia: " + cmbDistancia.getValue() + "\n" +
-                            "Tipo de enlace: " + cmbTipoEnlace.getValue() + "\n" +
-                            "Altura del árbol: " + dendrograma.altura(dendrogramaRaiz) + "\n" +
-                            "Hojas: " + dendrograma.contarHojas(dendrogramaRaiz) + "\n" +
-                            "Distancia máx. de fusión: " + String.format("%.4f", dendrogramaRaiz.getDistancia()) + "\n" +
-                            "Fusiones: " + motor.obtenerNumeroFusiones());
-
-                    reportePrincipalCache = resultado.toString();
-
                     ListaDoble<Nodo> clustersParaColorear = null;
 
                     if (k > 1 && dendrogramaRaiz != null) {
                         try {
                             clustersParaColorear = dendrograma.cortarArbol(dendrogramaRaiz, k);
-                            resultado.append("\n\n").append(generarReporteClusters(clustersParaColorear));
                         } catch (Exception e) {
-                            resultado.append("\n\nError al cortar el árbol: ").append(e.getMessage());
+                            mostrarError("Error al cortar el árbol", e.getMessage());
                         }
                     }
 
-                    txtResultado.setText(resultado.toString());
                     DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersParaColorear);
 
                     lblEstado.setText("Clustering completado");
@@ -289,7 +274,6 @@ public class ControladorPrincipal {
 
         String umbralStr = txtDistanciaUmbral.getText();
         if (umbralStr == null || umbralStr.isBlank()) {
-            txtResultado.setText(reportePrincipalCache);
             DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, null);
             return;
         }
@@ -303,7 +287,6 @@ public class ControladorPrincipal {
 
             ListaDoble<Nodo> clustersLista = dendrograma.cortarPorDistancia(dendrogramaRaiz, umbral);
 
-            txtResultado.setText(reportePrincipalCache + "\n\n" + generarReporteClusters(clustersLista));
             DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersLista);
 
         } catch (NumberFormatException e) {
@@ -314,20 +297,7 @@ public class ControladorPrincipal {
         }
     }
 
-    private String generarReporteClusters(ListaDoble<Nodo> clusters) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Resultado del Corte en ").append(clusters.tamanio()).append(" Clusters\n");
-        sb.append("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-
-        for (int i = 0; i < clusters.tamanio(); i++) {
-            Nodo cluster = clusters.obtener(i);
-            sb.append("Cluster ").append(i + 1).append(" (").append(dendrograma.contarHojas(cluster)).append(" miembros):\n");
-
-            String[] etiquetas = dendrograma.obtenerEtiquetasHojas(cluster);
-            sb.append("  ").append(unirCadenas(etiquetas, ", ")).append("\n\n");
-        }
-        return sb.toString();
-    }
+    
 
     @FXML
     private void onExportarJSON() {
@@ -360,16 +330,7 @@ public class ControladorPrincipal {
         }
     }
 
-    private void actualizarTextoResultadoCarga(){
-        txtResultado.setText(
-                "✓ Archivo cargado exitosamente\n" +
-                        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
-                        "Películas: " + cargador.getNumeroFilas() + "\n" +
-                        "Dimensiones totales: " + cargador.getDimensiones() + "\n" +
-                        "Variables seleccionadas: " + selector.getNumeroSeleccionadas() + "\n" +
-                        "Variables a usar: " + unirCadenas(selector.getColumnasSeleccionadas(), ", ")
-        );
-    }
+    
 
     private FactoryNormalizacion.TipoNormalizacion obtenerTipoNormalizacion() {
         switch (cmbNormalizacion.getValue()) {

@@ -6,19 +6,17 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<Pane style="-fx-background-color: #3D3A3A;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorPrincipal">
+<AnchorPane style="-fx-background-color: #3D3A3A;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controlador.ControladorPrincipal">
    <children>
       <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#3d3a3a" height="124.0" layoutX="23.0" layoutY="466.0" stroke="WHITE" width="282.0" />
       <Line endX="80.171875" endY="-1.0" layoutX="35.0" layoutY="467.0" startX="1.0" startY="-1.0" stroke="#3d3a3a" strokeWidth="3.0" />
@@ -136,23 +134,10 @@
          <font>
             <Font name="Consolas" size="12.0" />
          </font></Label>
-      <TabPane fx:id="tabPaneResultados" layoutX="324.0" prefHeight="610.0" prefWidth="690.0" style="-fx-background-color: #3D3A3A;" tabClosingPolicy="UNAVAILABLE">
-        <tabs>
-          <Tab text="Gráfico Dendrograma">
-            <content>
-              <ScrollPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #3D3A3A;">
-                     <content>
-                        <Pane fx:id="paneDendrograma" prefHeight="582.0" prefWidth="702.0" style="-fx-background-color: #3D3A3A;" />
-                     </content>
-              </ScrollPane>
-            </content>
-          </Tab>
-          <Tab text="Resultado en Texto">
-            <content>
-              <TextArea fx:id="txtResultado" editable="false" prefHeight="520.0" prefWidth="680.0" wrapText="true" />
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
+      <ScrollPane stylesheets="@../style/scroll-pane.css" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="324.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <content>
+            <Pane fx:id="paneDendrograma" prefHeight="582.0" prefWidth="702.0" style="-fx-background-color: #3D3A3A;" stylesheets="@../style/scroll-pane.css" />
+         </content>
+      </ScrollPane>
    </children>
-</Pane>
+</AnchorPane>
