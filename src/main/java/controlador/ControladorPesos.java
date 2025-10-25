@@ -7,8 +7,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
-import java.util.ArrayList;
-import java.util.List;
+import modelo.estructuras.ListaDoble;
 
 public class ControladorPesos {
 
@@ -16,7 +15,7 @@ public class ControladorPesos {
     @FXML private Button btnGuardar;
     @FXML private Button btnCancelar;
 
-    private List<TextField> camposDeTexto = new ArrayList<>();
+    private ListaDoble<TextField> camposDeTexto = new ListaDoble<>();
     private double[] nuevosPesos;
     private boolean guardado = false;
 
@@ -31,7 +30,7 @@ public class ControladorPesos {
             TextField pesoField = new TextField(String.valueOf(pesosActuales[i]));
 
             // Guardar referencia al campo de texto
-            camposDeTexto.add(pesoField);
+            camposDeTexto.agregar(pesoField);
 
             gridPesos.add(nombreLabel, 0, i);
             gridPesos.add(pesoField, 1, i);
@@ -40,10 +39,10 @@ public class ControladorPesos {
 
     @FXML
     private void onGuardar() {
-        nuevosPesos = new double[camposDeTexto.size()];
+        nuevosPesos = new double[camposDeTexto.tamanio()];
         try {
-            for (int i = 0; i < camposDeTexto.size(); i++) {
-                double peso = Double.parseDouble(camposDeTexto.get(i).getText());
+            for (int i = 0; i < camposDeTexto.tamanio(); i++) {
+                double peso = Double.parseDouble(camposDeTexto.obtener(i).getText());
                 if (peso < 0) {
                     // Opcional: Mostrar error al usuario
                     System.err.println("Error: El peso no puede ser negativo.");

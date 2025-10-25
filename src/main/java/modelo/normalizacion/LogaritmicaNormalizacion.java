@@ -1,6 +1,6 @@
 package modelo.normalizacion;
 
-import modelo.estructuras.*;
+import modelo.estructuras.Vector;
 
 public class LogaritmicaNormalizacion implements INormalizacion {
 

@@ -6,196 +6,219 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import modelo.estructuras.Diccionario;
 import modelo.estructuras.ListaDoble;
 import modelo.estructuras.Nodo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-
 public class DendrogramaDrawer {
 
-    private static final double PADDING_TOP_BOTTOM = 50;
-    private static final double PADDING_SIDES = 50;
-    private static final double MIN_LEAF_SPACING = 20; // Horizontal spacing
-    private static final double FONT_SIZE = 10;
-    private static final List<Color> COLORS = List.of(
+    private static final double MARGEN_SUPERIOR_INFERIOR = 50;
+    private static final double MARGEN_LATERAL = 50;
+    private static final double ESPACIADO_MINIMO_HOJAS = 20;
+    private static final double TAMANO_FUENTE = 10;
+    private static final Color[] COLORES = {
             Color.web("#e6194B"), Color.web("#3cb44b"), Color.web("#ffe119"), Color.web("#4363d8"),
             Color.web("#f58231"), Color.web("#911eb4"), Color.web("#46f0f0"), Color.web("#f032e6"),
             Color.web("#bcf60c"), Color.web("#fabebe"), Color.web("#008080"), Color.web("#e6beff"),
             Color.web("#9a6324"), Color.web("#fffac8"), Color.web("#800000"), Color.web("#aaffc3"),
             Color.web("#808000"), Color.web("#ffd8b1"), Color.web("#000075"), Color.web("#808080")
-    );
+    };
 
-    public static void draw(Pane pane, Nodo root, List<Nodo> clustersToColor) {
-        pane.getChildren().clear();
-        if (root == null) return;
+    public static void draw(Pane panel, Nodo raiz, ListaDoble<Nodo> clustersParaColorear) {
+        panel.getChildren().clear();
+        if (raiz == null) return;
 
-        // 1. Get labels to calculate layout
-        List<String> leafLabels = new ArrayList<>();
-        getLeafLabels(root, leafLabels);
+        // 1. Obtener etiquetas para calcular el diseño
+        ListaDoble<String> etiquetasHojas = new ListaDoble<>();
+        obtenerEtiquetasHojas(raiz, etiquetasHojas);
 
-        // 2. Calculate required spacing based on horizontal label widths
-        double maxLabelWidth = 0;
-        for (String label : leafLabels) {
-            Text text = new Text(label);
-            text.setFont(Font.font(FONT_SIZE));
-            maxLabelWidth = Math.max(maxLabelWidth, text.getLayoutBounds().getWidth());
+        // 2. Calcular espaciado requerido basado en anchos de etiquetas
+        double anchoMaximoEtiqueta = 0;
+        for (int i = 0; i < etiquetasHojas.tamanio(); i++) {
+            String etiqueta = etiquetasHojas.obtener(i);
+            Text texto = new Text(etiqueta);
+            texto.setFont(Font.font(TAMANO_FUENTE));
+            anchoMaximoEtiqueta = Math.max(anchoMaximoEtiqueta, texto.getLayoutBounds().getWidth());
         }
-        double leafSpacing = Math.max(MIN_LEAF_SPACING, maxLabelWidth);
+        double espaciadoHojas = Math.max(ESPACIADO_MINIMO_HOJAS, anchoMaximoEtiqueta);
 
-        // 3. Build color map
-        Map<Nodo, Color> colorMap = buildColorMap(root, clustersToColor);
+        // 3. Construir mapa de colores
+        Diccionario<Nodo, Color> mapaColores = construirMapaColores(raiz, clustersParaColorear);
 
-        // 4. Calculate node positions with new spacing
-        Map<Nodo, Point2D> positions = calculateNodePositions(root, pane, leafSpacing);
+        // 4. Calcular posiciones de nodos con nuevo espaciado
+        Diccionario<Nodo, Point2D> posiciones = calcularPosicionesNodos(raiz, panel, espaciadoHojas);
 
-        // 5. Draw nodes with colors
-        drawNode(pane, root, positions, colorMap);
+        // 5. Dibujar nodos con colores
+        dibujarNodo(panel, raiz, posiciones, mapaColores);
     }
 
-    private static Map<Nodo, Color> buildColorMap(Nodo root, List<Nodo> clustersToColor) {
-        Map<Nodo, Color> colorMap = new HashMap<>();
-        if (clustersToColor == null || clustersToColor.isEmpty()) {
-            colorSubtree(root, Color.BLACK, colorMap);
+    private static Diccionario<Nodo, Color> construirMapaColores(Nodo raiz, ListaDoble<Nodo> clustersParaColorear) {
+        Diccionario<Nodo, Color> mapaColores = new Diccionario<>();
+
+        if (clustersParaColorear == null || clustersParaColorear.tamanio() == 0) {
+            colorearSubarbol(raiz, Color.BLACK, mapaColores);
         } else {
-            colorSubtree(root, Color.BLACK, colorMap); // Start with all black
-            for (int i = 0; i < clustersToColor.size(); i++) {
-                Nodo clusterRoot = clustersToColor.get(i);
-                Color color = COLORS.get(i % COLORS.size());
-                colorSubtree(clusterRoot, color, colorMap); // Override with specific colors
+            colorearSubarbol(raiz, Color.BLACK, mapaColores); // Comenzar con todo negro
+            for (int i = 0; i < clustersParaColorear.tamanio(); i++) {
+                Nodo raizCluster = clustersParaColorear.obtener(i);
+                Color color = COLORES[i % COLORES.length];
+                colorearSubarbol(raizCluster, color, mapaColores); // Sobrescribir con colores específicos
             }
         }
-        return colorMap;
+        return mapaColores;
     }
 
-    private static void colorSubtree(Nodo node, Color color, Map<Nodo, Color> colorMap) {
-        if (node == null) return;
-        colorMap.put(node, color);
-        colorSubtree(node.getIzquierdo(), color, colorMap);
-        colorSubtree(node.getDerecho(), color, colorMap);
+    private static void colorearSubarbol(Nodo nodo, Color color, Diccionario<Nodo, Color> mapaColores) {
+        if (nodo == null) return;
+        mapaColores.poner(nodo, color);
+        colorearSubarbol(nodo.getIzquierdo(), color, mapaColores);
+        colorearSubarbol(nodo.getDerecho(), color, mapaColores);
     }
 
-    private static void getLeafLabels(Nodo node, List<String> labels) {
-        if (node.esHoja()) {
+    private static void obtenerEtiquetasHojas(Nodo nodo, ListaDoble<String> etiquetas) {
+        if (nodo.esHoja()) {
             // Una hoja puede tener uno o más elementos
-            ListaDoble.IteradorLista<String> it = node.getElementos().iterador();
-            while (it.tieneSiguiente()) {
-                labels.add(it.siguiente());
+            ListaDoble.IteradorLista<String> iterador = nodo.getElementos().iterador();
+            while (iterador.tieneSiguiente()) {
+                etiquetas.agregar(iterador.siguiente());
             }
             return;
         }
-        getLeafLabels(node.getIzquierdo(), labels);
-        getLeafLabels(node.getDerecho(), labels);
+        obtenerEtiquetasHojas(nodo.getIzquierdo(), etiquetas);
+        obtenerEtiquetasHojas(nodo.getDerecho(), etiquetas);
     }
 
-    private static void drawNode(Pane pane, Nodo node, Map<Nodo, Point2D> positions, Map<Nodo, Color> colorMap) {
-        if (node == null) return;
+    private static void dibujarNodo(Pane panel, Nodo nodo, Diccionario<Nodo, Point2D> posiciones, Diccionario<Nodo, Color> mapaColores) {
+        if (nodo == null) return;
 
-        Point2D pos = positions.get(node);
-        Color color = colorMap.getOrDefault(node, Color.BLACK);
+        Point2D posicion = posiciones.obtener(nodo);
+        Color color = mapaColores.contieneClave(nodo) ? mapaColores.obtener(nodo) : Color.BLACK;
 
-        if (node.esHoja()) {
+        if (nodo.esHoja()) {
             // Obtener las etiquetas de la hoja
-            ListaDoble<String> elementos = node.getElementos();
-            StringBuilder labelText = new StringBuilder();
+            ListaDoble<String> elementos = nodo.getElementos();
+            StringBuilder textoEtiqueta = new StringBuilder();
 
-            ListaDoble.IteradorLista<String> it = elementos.iterador();
+            ListaDoble.IteradorLista<String> iterador = elementos.iterador();
             boolean primero = true;
-            while (it.tieneSiguiente()) {
-                if (!primero) labelText.append(", ");
-                labelText.append(it.siguiente());
+            while (iterador.tieneSiguiente()) {
+                if (!primero) textoEtiqueta.append(", ");
+                textoEtiqueta.append(iterador.siguiente());
                 primero = false;
             }
 
-            Text label = new Text(labelText.toString());
-            label.setFont(Font.font(FONT_SIZE));
-            label.setFill(color);
-            label.setStyle("-fx-font-weight: bold;");
+            Text etiqueta = new Text(textoEtiqueta.toString());
+            etiqueta.setFont(Font.font(TAMANO_FUENTE));
+            etiqueta.setFill(color);
+            etiqueta.setStyle("-fx-font-weight: bold;");
 
-            // Center the label horizontally
-            double labelWidth = label.getLayoutBounds().getWidth();
-            label.setX(pos.getX() - (labelWidth / 2));
-            label.setY(pos.getY() + FONT_SIZE + 5); // Position below the line end, considering font size
-            pane.getChildren().add(label);
+            // Centrar la etiqueta horizontalmente
+            double anchoEtiqueta = etiqueta.getLayoutBounds().getWidth();
+            etiqueta.setX(posicion.getX() - (anchoEtiqueta / 2));
+            etiqueta.setY(posicion.getY() + TAMANO_FUENTE + 5);
+            panel.getChildren().add(etiqueta);
 
         } else {
-            Point2D leftPos = positions.get(node.getIzquierdo());
-            Point2D rightPos = positions.get(node.getDerecho());
+            Point2D posicionIzquierda = posiciones.obtener(nodo.getIzquierdo());
+            Point2D posicionDerecha = posiciones.obtener(nodo.getDerecho());
 
-            Line hLine = new Line(leftPos.getX(), pos.getY(), rightPos.getX(), pos.getY());
-            hLine.setStroke(color);
-            hLine.setStrokeWidth(1.5);
+            Line lineaHorizontal = new Line(posicionIzquierda.getX(), posicion.getY(), posicionDerecha.getX(), posicion.getY());
+            lineaHorizontal.setStroke(color);
+            lineaHorizontal.setStrokeWidth(1.5);
 
-            Line vLineLeft = new Line(leftPos.getX(), leftPos.getY(), leftPos.getX(), pos.getY());
-            vLineLeft.setStroke(colorMap.getOrDefault(node.getIzquierdo(), Color.BLACK));
-            vLineLeft.setStrokeWidth(1.5);
+            Color colorIzquierdo = mapaColores.contieneClave(nodo.getIzquierdo()) ?
+                    mapaColores.obtener(nodo.getIzquierdo()) : Color.BLACK;
+            Color colorDerecho = mapaColores.contieneClave(nodo.getDerecho()) ?
+                    mapaColores.obtener(nodo.getDerecho()) : Color.BLACK;
 
-            Line vLineRight = new Line(rightPos.getX(), rightPos.getY(), rightPos.getX(), pos.getY());
-            vLineRight.setStroke(colorMap.getOrDefault(node.getDerecho(), Color.BLACK));
-            vLineRight.setStrokeWidth(1.5);
+            Line lineaVerticalIzquierda = new Line(posicionIzquierda.getX(), posicionIzquierda.getY(), posicionIzquierda.getX(), posicion.getY());
+            lineaVerticalIzquierda.setStroke(colorIzquierdo);
+            lineaVerticalIzquierda.setStrokeWidth(1.5);
 
-            pane.getChildren().addAll(hLine, vLineLeft, vLineRight);
+            Line lineaVerticalDerecha = new Line(posicionDerecha.getX(), posicionDerecha.getY(), posicionDerecha.getX(), posicion.getY());
+            lineaVerticalDerecha.setStroke(colorDerecho);
+            lineaVerticalDerecha.setStrokeWidth(1.5);
 
-            drawNode(pane, node.getIzquierdo(), positions, colorMap);
-            drawNode(pane, node.getDerecho(), positions, colorMap);
+            panel.getChildren().addAll(lineaHorizontal, lineaVerticalIzquierda, lineaVerticalDerecha);
+
+            dibujarNodo(panel, nodo.getIzquierdo(), posiciones, mapaColores);
+            dibujarNodo(panel, nodo.getDerecho(), posiciones, mapaColores);
         }
     }
 
-    private static Map<Nodo, Point2D> calculateNodePositions(Nodo root, Pane pane, double leafSpacing) {
-        Map<Nodo, Point2D> positions = new HashMap<>();
-        AtomicInteger leafCounter = new AtomicInteger(0);
-        double maxDist = root.getDistancia();
+    private static Diccionario<Nodo, Point2D> calcularPosicionesNodos(Nodo raiz, Pane panel, double espaciadoHojas) {
+        Diccionario<Nodo, Point2D> posiciones = new Diccionario<>();
+        ContadorHojas contadorHojas = new ContadorHojas();
+        double distanciaMaxima = raiz.getDistancia();
 
-        calculateLeafX(root, leafCounter, positions, leafSpacing);
+        calcularXHojas(raiz, contadorHojas, posiciones, espaciadoHojas);
 
-        double paneWidth = (leafCounter.get() - 1) * leafSpacing + 2 * PADDING_SIDES;
-        calculateInternalX(root, positions);
+        double anchoPanel = (contadorHojas.getValor() - 1) * espaciadoHojas + 2 * MARGEN_LATERAL;
+        calcularXInternos(raiz, posiciones);
 
-        // Recalculate height requirements for horizontal labels
-        double labelZoneHeight = 50.0; // Fixed height for labels below the dendrogram
-        double dendrogramZoneHeight = pane.getPrefHeight() - labelZoneHeight - PADDING_TOP_BOTTOM;
-        double paneHeight = pane.getPrefHeight();
+        // Recalcular requisitos de altura para etiquetas horizontales
+        double alturaZonaEtiquetas = 50.0;
+        double alturaZonaDendrograma = panel.getPrefHeight() - alturaZonaEtiquetas - MARGEN_SUPERIOR_INFERIOR;
+        double alturaPanel = panel.getPrefHeight();
 
-        double scaleY = (dendrogramZoneHeight - PADDING_TOP_BOTTOM * 2) / maxDist;
+        double escalaY = (alturaZonaDendrograma - MARGEN_SUPERIOR_INFERIOR * 2) / distanciaMaxima;
 
-        setYPositions(root, positions, scaleY, paneHeight, dendrogramZoneHeight);
+        establecerPosicionesY(raiz, posiciones, escalaY, alturaPanel, alturaZonaDendrograma);
 
-        pane.setPrefSize(paneWidth, paneHeight);
-        return positions;
+        panel.setPrefSize(anchoPanel, alturaPanel);
+        return posiciones;
     }
 
-    private static void calculateLeafX(Nodo node, AtomicInteger counter, Map<Nodo, Point2D> positions, double leafSpacing) {
-        if (node.esHoja()) {
-            double x = PADDING_SIDES + counter.getAndIncrement() * leafSpacing;
-            positions.put(node, new Point2D(x, 0));
+    private static void calcularXHojas(Nodo nodo, ContadorHojas contador, Diccionario<Nodo, Point2D> posiciones, double espaciadoHojas) {
+        if (nodo.esHoja()) {
+            double x = MARGEN_LATERAL + contador.incrementarYObtener() * espaciadoHojas;
+            posiciones.poner(nodo, new Point2D(x, 0));
             return;
         }
-        calculateLeafX(node.getIzquierdo(), counter, positions, leafSpacing);
-        calculateLeafX(node.getDerecho(), counter, positions, leafSpacing);
+        calcularXHojas(nodo.getIzquierdo(), contador, posiciones, espaciadoHojas);
+        calcularXHojas(nodo.getDerecho(), contador, posiciones, espaciadoHojas);
     }
 
-    private static void calculateInternalX(Nodo node, Map<Nodo, Point2D> positions) {
-        if (node.esHoja()) {
+    private static void calcularXInternos(Nodo nodo, Diccionario<Nodo, Point2D> posiciones) {
+        if (nodo.esHoja()) {
             return;
         }
-        calculateInternalX(node.getIzquierdo(), positions);
-        calculateInternalX(node.getDerecho(), positions);
+        calcularXInternos(nodo.getIzquierdo(), posiciones);
+        calcularXInternos(nodo.getDerecho(), posiciones);
 
-        double x = (positions.get(node.getIzquierdo()).getX() + positions.get(node.getDerecho()).getX()) / 2;
-        positions.put(node, new Point2D(x, 0));
+        double x = (posiciones.obtener(nodo.getIzquierdo()).getX() + posiciones.obtener(nodo.getDerecho()).getX()) / 2;
+        posiciones.poner(nodo, new Point2D(x, 0));
     }
 
-    private static void setYPositions(Nodo node, Map<Nodo, Point2D> positions, double scaleY, double paneHeight, double dendrogramZoneHeight) {
-        double x = positions.get(node).getX();
-        double y = PADDING_TOP_BOTTOM + (dendrogramZoneHeight - node.getDistancia() * scaleY);
-        positions.put(node, new Point2D(x, y));
+    private static void establecerPosicionesY(Nodo nodo, Diccionario<Nodo, Point2D> posiciones, double escalaY, double alturaPanel, double alturaZonaDendrograma) {
+        double x = posiciones.obtener(nodo).getX();
+        double y = MARGEN_SUPERIOR_INFERIOR + (alturaZonaDendrograma - nodo.getDistancia() * escalaY);
+        posiciones.poner(nodo, new Point2D(x, y));
 
-        if (!node.esHoja()) {
-            setYPositions(node.getIzquierdo(), positions, scaleY, paneHeight, dendrogramZoneHeight);
-            setYPositions(node.getDerecho(), positions, scaleY, paneHeight, dendrogramZoneHeight);
+        if (!nodo.esHoja()) {
+            establecerPosicionesY(nodo.getIzquierdo(), posiciones, escalaY, alturaPanel, alturaZonaDendrograma);
+            establecerPosicionesY(nodo.getDerecho(), posiciones, escalaY, alturaPanel, alturaZonaDendrograma);
+        }
+    }
+
+    // ========== CLASE AUXILIAR ==========
+
+    /**
+     * Reemplazo de AtomicInteger - contador simple
+     */
+    private static class ContadorHojas {
+        private int valor;
+
+        public ContadorHojas() {
+            this.valor = 0;
+        }
+
+        public int incrementarYObtener() {
+            return valor++;
+        }
+
+        public int getValor() {
+            return valor;
         }
     }
 }
