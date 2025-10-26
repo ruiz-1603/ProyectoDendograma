@@ -2,9 +2,6 @@ package modelo.clustering;
 
 import modelo.estructuras.Matriz;
 
-/**
- * Responsabilidad: Calcular actualizaciones de distancia usando Lance-Williams
- */
 public class CalculadorLanceWilliams {
 
     public enum TipoEnlace {
@@ -20,9 +17,6 @@ public class CalculadorLanceWilliams {
         this.tipoEnlace = tipoEnlace;
     }
 
-    /**
-     * Actualiza la matriz de distancias después de fusionar los clusters i y j
-     */
     public void actualizarMatriz(Matriz matrizDistancias, int i, int j,
                                  double distanciaIJ, int[] tamanoClusters,
                                  int numeroClusters) {
@@ -89,9 +83,7 @@ public class CalculadorLanceWilliams {
         this.tipoEnlace = tipoEnlace;
     }
 
-    /**
-     * Clase interna para almacenar parámetros de Lance-Williams
-     */
+    // clase interna para almacenar parametros de Lance-Williams
     private static class ParametrosLanceWilliams {
         final double alphaI;
         final double alphaJ;

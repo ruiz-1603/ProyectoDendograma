@@ -6,6 +6,7 @@ public class Nodo {
     private Nodo derecho;
     private double distancia;
     private ListaDoble<String> elementos;
+    private String nombre; // Nuevo campo para el nombre
 
     public Nodo(String elemento) {
         this.elementos = new ListaDoble<>();
@@ -13,6 +14,7 @@ public class Nodo {
         this.distancia = 0.0;
         this.izquierdo = null;
         this.derecho = null;
+        this.nombre = elemento; // Para hojas, el nombre es el elemento
     }
 
     public Nodo(Nodo izquierdo, Nodo derecho, double distancia) {
@@ -25,13 +27,23 @@ public class Nodo {
 
         ListaDoble.IteradorLista<String> it2 = derecho.getElementos().iterador();
         while (it2.tieneSiguiente()) this.elementos.agregar(it2.siguiente());
+        this.nombre = null; // Por defecto, los nodos internos no tienen nombre explícito
     }
 
     public boolean esHoja() {
         return izquierdo == null && derecho == null;
     }
 
-    public String getNombre() { return "(" + elementos.toString().replace(", ", ";") + ")"; }
+    public String getNombre() {
+        if (nombre != null) {
+            return nombre;
+        }
+        return "(" + elementos.toString().replace(", ", ";") + ")";
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
     public Nodo getIzquierdo() {
         return izquierdo;

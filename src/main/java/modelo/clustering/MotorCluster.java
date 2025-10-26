@@ -4,12 +4,8 @@ import modelo.estructuras.*;
 import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
 
-/**
- * Responsabilidad: LÓGICA DEL ALGORITMO de clustering jerárquico aglomerativo
- */
 public class MotorCluster {
 
-    // Para mantener compatibilidad con código existente
     public enum TipoEnlace {
         MINIMO,
         MAXIMO,
@@ -21,7 +17,6 @@ public class MotorCluster {
     private Matriz matrizDistancias;
     private CalculadorMatrizDistancia calculadorMatriz;
 
-    // Componentes especializados
     private CalculadorLanceWilliams calculadorLanceWilliams;
     private FusionadorCluster fusionador;
     private EstadisticasCluster estadisticas;
@@ -38,9 +33,6 @@ public class MotorCluster {
         this.fusionador = new FusionadorCluster();
     }
 
-    /**
-     * Construye el dendrograma usando clustering jerárquico aglomerativo
-     */
     public Nodo construirDendrograma(Vector[] vectores, FactoryDistancia.TipoDistancia tipoDistancia) {
         if (vectores == null || vectores.length == 0) {
             throw new IllegalArgumentException("Array de vectores no puede estar vacío");
@@ -52,15 +44,15 @@ public class MotorCluster {
                 calculadorLanceWilliams.getTipoEnlace()
         );
 
-        // Fase 1: Calcular matriz de distancias inicial
+        // calcular matriz de distancias inicial
         System.out.println("  [Clustering] Calculando matriz de distancias inicial...");
         matrizDistancias = calculadorMatriz.calcular(vectores, tipoDistancia);
 
-        // Fase 2: Inicializar clusters (uno por vector)
+        // inicializar clusters (uno por vector)
         String[] etiquetas = extraerEtiquetas(vectores);
         fusionador.inicializar(etiquetas);
 
-        // Fase 3: Ejecutar algoritmo de clustering
+        // ejecutar algoritmo de clustering
         long inicio = System.currentTimeMillis();
         ejecutarAlgoritmo();
         long duracion = System.currentTimeMillis() - inicio;
@@ -92,7 +84,7 @@ public class MotorCluster {
         while (fusionador.tieneMasDeUnCluster()) {
             iteracion++;
 
-            // Paso 1: Encontrar el par de clusters más próximo
+            // encontrar el par de clusters más próximo
             int[] parMin = fusionador.encontrarParMasProximo(matrizDistancias);
             int i = parMin[0];
             int j = parMin[1];
@@ -103,11 +95,11 @@ public class MotorCluster {
                 break;
             }
 
-            // Paso 2: Obtener distancia de fusión
+            // obtener distancia de fusión
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
             estadisticas.registrarFusion(distanciaFusion);
 
-            // Paso 3: Actualizar matriz de distancias usando Lance-Williams
+            // actualizar matriz de distancias usando Lance-Williams
             // (ANTES de fusionar, porque necesitamos los índices i, j originales)
             calculadorLanceWilliams.actualizarMatriz(
                     matrizDistancias,
@@ -117,14 +109,11 @@ public class MotorCluster {
                     fusionador.getNumeroClusters()
             );
 
-            // Paso 4: Fusionar los clusters i y j
+            // fusionar los clusters i y j
             fusionador.fusionar(i, j, distanciaFusion);
         }
     }
 
-    /**
-     * Extrae las etiquetas de los vectores
-     */
     private String[] extraerEtiquetas(Vector[] vectores) {
         String[] etiquetas = new String[vectores.length];
         for (int i = 0; i < vectores.length; i++) {
@@ -133,9 +122,6 @@ public class MotorCluster {
         return etiquetas;
     }
 
-    /**
-     * Convierte TipoEnlace del MotorCluster a TipoEnlace del CalculadorLanceWilliams
-     */
     private CalculadorLanceWilliams.TipoEnlace convertirTipoEnlace(TipoEnlace tipo) {
         switch (tipo) {
             case MINIMO: return CalculadorLanceWilliams.TipoEnlace.MINIMO;
@@ -156,8 +142,6 @@ public class MotorCluster {
         }
     }
 
-    // ========== API PÚBLICA (mantener compatibilidad) ==========
-
     public ListaDoble<Double> obtenerDistanciasFusion() {
         return estadisticas != null ? estadisticas.getDistanciasFusion() : new ListaDoble<>();
     }
@@ -176,7 +160,7 @@ public class MotorCluster {
 
     public void imprimirDendrograma(Nodo raiz) {
         Dendrograma dendo = new Dendrograma();
-        System.out.println("=== Dendrograma ===");
+        System.out.println("Dendrograma");
         System.out.println("Tipo de enlace: " + getTipoEnlace());
         System.out.println("Distancias de fusión: " + obtenerNumeroFusiones());
         System.out.println();

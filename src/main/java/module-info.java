@@ -5,4 +5,5 @@ module org.example {
     opens org.example to javafx.fxml;
     opens controlador to javafx.fxml;
     exports org.example;
+    exports modelo.estructuras;
 }

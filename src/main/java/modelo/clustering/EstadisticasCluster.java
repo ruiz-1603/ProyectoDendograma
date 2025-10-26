@@ -2,9 +2,6 @@ package modelo.clustering;
 
 import modelo.estructuras.ListaDoble;
 
-/**
- * Responsabilidad: Calcular y mostrar estadísticas del clustering
- */
 public class EstadisticasCluster {
 
     private int vectoresIniciales;
@@ -17,30 +14,18 @@ public class EstadisticasCluster {
         this.distanciasFusion = new ListaDoble<>();
     }
 
-    /**
-     * Registra una nueva fusión
-     */
     public void registrarFusion(double distancia) {
         distanciasFusion.agregar(distancia);
     }
 
-    /**
-     * Obtiene el número total de fusiones realizadas
-     */
     public int getNumeroFusiones() {
         return distanciasFusion.tamanio();
     }
 
-    /**
-     * Obtiene todas las distancias de fusión
-     */
     public ListaDoble<Double> getDistanciasFusion() {
         return distanciasFusion;
     }
 
-    /**
-     * Calcula la distancia mínima de fusión
-     */
     public double getDistanciaMinima() {
         if (distanciasFusion.tamanio() == 0) return 0.0;
 
@@ -54,9 +39,6 @@ public class EstadisticasCluster {
         return min;
     }
 
-    /**
-     * Calcula la distancia máxima de fusión
-     */
     public double getDistanciaMaxima() {
         if (distanciasFusion.tamanio() == 0) return 0.0;
 
@@ -70,9 +52,6 @@ public class EstadisticasCluster {
         return max;
     }
 
-    /**
-     * Calcula la distancia promedio de fusión
-     */
     public double getDistanciaPromedio() {
         if (distanciasFusion.tamanio() == 0) return 0.0;
 
@@ -83,9 +62,6 @@ public class EstadisticasCluster {
         return suma / distanciasFusion.tamanio();
     }
 
-    /**
-     * Imprime estadísticas del clustering
-     */
     public void imprimir() {
         System.out.println("=== Estadísticas de Clustering ===");
         System.out.println("Vectores iniciales: " + vectoresIniciales);
