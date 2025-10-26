@@ -4,9 +4,6 @@ import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
 import modelo.estructuras.ListaDoble;
 
-/**
- * Responsabilidad: Extraer y mantener categorías únicas de columnas categóricas
- */
 public class ExtractorCategorias {
 
     private IDiccionario<String, ListaDoble<String>> categoriasUnicas;
@@ -29,16 +26,16 @@ public class ExtractorCategorias {
                 }
             }
 
-            // Si no hay valores únicos, agregar "desconocido"
+            // si no hay valores únicos, agregar "desconocido"
             if (unicos.tamanio() == 0) {
                 unicos.poner("desconocido", true);
             }
 
-            // Convertir a ListaDoble ordenada
+            // convertir a ListaDoble ordenada
             ListaDoble<String> listaUnicos = new ListaDoble<>();
             ListaDoble<String> claves = unicos.conjuntoClaves();
 
-            // Ordenar las categorías
+            // ordenar las categorias
             ListaDoble<String> clavesOrdenadas = ordenarCategorias(claves);
             for (int i = 0; i < clavesOrdenadas.tamanio(); i++) {
                 listaUnicos.agregar(clavesOrdenadas.obtener(i));
@@ -51,12 +48,12 @@ public class ExtractorCategorias {
     private ListaDoble<String> ordenarCategorias(ListaDoble<String> categorias) {
         ListaDoble<String> ordenadas = new ListaDoble<>();
 
-        // Copiar todas las categorías
+        // copiar todas las categorias
         for (int i = 0; i < categorias.tamanio(); i++) {
             ordenadas.agregar(categorias.obtener(i));
         }
 
-        // Ordenar usando el comparador de ListaDoble
+        // ordenar usando el comparador de ListaDoble
         ordenadas.ordenar(new ListaDoble.Comparador<String>() {
             @Override
             public int comparar(String a, String b) {

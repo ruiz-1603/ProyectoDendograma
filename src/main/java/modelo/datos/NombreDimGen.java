@@ -2,9 +2,7 @@ package modelo.datos;
 
 import modelo.estructuras.ListaDoble;
 
-/**
- * Responsabilidad: Generar nombres descriptivos para cada dimensión del vector
- */
+// generar nombres descriptivos para cada dimensión del vector
 public class NombreDimGen {
 
     private ConfiguradorColumnas configurador;
@@ -19,12 +17,12 @@ public class NombreDimGen {
     public String[] generar() {
         ListaDoble<String> nombres = new ListaDoble<>();
 
-        // 1. Columnas numéricas
+        // columnas numericas
         for (String col : configurador.getColumnasNumericas()) {
             nombres.agregar(col);
         }
 
-        // 2. Columnas categóricas (one-hot)
+        // columnas categoricas (one-hot)
         for (String columna : configurador.getColumnasCategoricas()) {
             ListaDoble<String> categorias = extractorCategorias.obtenerCategorias(columna);
             if (categorias != null) {
@@ -35,17 +33,17 @@ public class NombreDimGen {
             }
         }
 
-        // 3. Columnas de conteo
+        // columnas de conteo
         for (String col : configurador.getColumnasConteo()) {
             nombres.agregar(col + "_conteo");
         }
 
-        // 4. Columnas de JSON array
+        // columnas de JSON array
         for (String col : configurador.getColumnasJsonArray()) {
             nombres.agregar(col + "_conteo");
         }
 
-        // 5. Fecha normalizada
+        // fecha normalizada
         nombres.agregar("release_date_normalizada");
 
         String[] resultado = new String[nombres.tamanio()];

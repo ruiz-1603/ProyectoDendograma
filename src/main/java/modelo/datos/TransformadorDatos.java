@@ -32,22 +32,22 @@ public class TransformadorDatos {
 
             ListaDoble<Double> datosVector = new ListaDoble<>();
 
-            // 1. Columnas numéricas directas
+            // columnas numéricas directas
             agregarColumnasNumericas(fila, datosVector);
 
-            // 2. Columnas categóricas (one-hot)
+            // columnas categóricas (one-hot)
             agregarColumnasCategoricas(fila, datosVector);
 
-            // 3. Columnas de conteo (texto)
+            // columnas de conteo (texto)
             agregarColumnasConteo(fila, datosVector);
 
-            // 4. Columnas de JSON array
+            // columnas de JSON array
             agregarColumnasJsonArray(fila, datosVector);
 
-            // 5. Columna de fecha (normalizada)
+            // columna de fecha (normalizada)
             agregarColumnaFecha(fila, datosVector);
 
-            // Crear vector
+            // crear vector
             double[] datos = new double[datosVector.tamanio()];
             for (int i = 0; i < datosVector.tamanio(); i++) {
                 datos[i] = datosVector.obtener(i);

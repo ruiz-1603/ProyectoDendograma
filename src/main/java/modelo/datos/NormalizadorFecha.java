@@ -6,9 +6,6 @@ import modelo.estructuras.ListaDoble;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Responsabilidad: Normalizar fechas a valores numéricos [0, 1]
- */
 public class NormalizadorFecha {
 
     private LocalDate fechaMinima;
@@ -32,7 +29,7 @@ public class NormalizadorFecha {
                     LocalDate fecha = LocalDate.parse(fechaStr.trim(), formateador);
                     fechas.agregar(fecha);
                 } catch (Exception e) {
-                    // Ignorar fechas inválidas
+                    // ignorar fechas invalidas
                 }
             }
         }

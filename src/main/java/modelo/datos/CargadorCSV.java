@@ -30,32 +30,32 @@ public class CargadorCSV {
     public void cargar(String ruta) throws IOException {
         this.rutaArchivo = ruta;
 
-        // 1. Parsear archivo CSV
+        // parsear archivo CSV
         parser.parsear(ruta);
         datos = parser.getFilas();
 
-        // 2. Configurar índices de columnas
+        // configurar indices de columnas
         configurador.construirIndices(parser.getEncabezados());
 
-        // 3. Extraer categorías únicas para one-hot encoding
+        // extraer categorias unicas para one-hot encoding
         extractorCategorias.extraer(datos, configurador.getColumnasCategoricas());
 
-        // 4. Extraer rango de fechas
+        // extraer rango de fechas
         normalizadorFechas.extraerRango(datos, configurador.getColumnaFecha());
 
-        // 5. Crear transformador y generador de nombres
+        // crear transformador y generador de nombres
         transformador = new TransformadorDatos(configurador, extractorCategorias, normalizadorFechas);
         generadorNombres = new NombreDimGen(configurador, extractorCategorias);
 
-        // Log del resultado
+        // log del resultado
         int totalDimensiones = generadorNombres.calcularTotalDimensiones();
-        System.out.println("✓ CSV cargado: " + datos.tamanio() + " películas");
-        System.out.println("  - Dimensiones numéricas: " + configurador.getColumnasNumericas().length);
-        System.out.println("  - Dimensiones categóricas (one-hot): " + extractorCategorias.contarDimensionesOneHot());
-        System.out.println("  - Dimensiones de conteo: " +
+        System.out.println("CSV cargado: " + datos.tamanio() + " películas");
+        System.out.println("- Dimensiones numéricas: " + configurador.getColumnasNumericas().length);
+        System.out.println("- Dimensiones categóricas (one-hot): " + extractorCategorias.contarDimensionesOneHot());
+        System.out.println("- Dimensiones de conteo: " +
                 (configurador.getColumnasConteo().length + configurador.getColumnasJsonArray().length));
-        System.out.println("  - Dimensión temporal: 1");
-        System.out.println("  - Total dimensiones: " + totalDimensiones);
+        System.out.println("- Dimensión temporal: 1");
+        System.out.println("- Total dimensiones: " + totalDimensiones);
     }
 
     public Vector[] getVectores() {
@@ -90,7 +90,7 @@ public class CargadorCSV {
     }
 
     public void imprimirEstadisticas() {
-        System.out.println("=== Estadísticas del CSV ===");
+        System.out.println("Estadísticas del CSV");
         System.out.println("Archivo: " + rutaArchivo);
         System.out.println("Películas: " + getNumeroFilas());
         System.out.println("Total dimensiones: " + getDimensiones());

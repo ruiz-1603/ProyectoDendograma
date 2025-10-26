@@ -7,9 +7,6 @@ import modelo.estructuras.ListaDoble;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-/**
- * Responsabilidad: Leer y parsear archivos CSV
- */
 public class ParserCSV {
 
     private String[] encabezados;
@@ -78,7 +75,7 @@ public class ParserCSV {
 
         campos.agregar(campoActual.toString());
 
-        // Convertir ListaDoble a array
+        // convertir ListaDoble a array
         String[] resultado = new String[campos.tamanio()];
         for (int j = 0; j < campos.tamanio(); j++) {
             resultado[j] = campos.obtener(j);

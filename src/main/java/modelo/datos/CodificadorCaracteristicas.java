@@ -2,9 +2,6 @@ package modelo.datos;
 
 import modelo.estructuras.ListaDoble;
 
-/**
- * Responsabilidad: Codificar características (one-hot encoding, conteos)
- */
 public class CodificadorCaracteristicas {
 
     public double[] codificarOneHot(String valor, ListaDoble<String> categorias) {
@@ -24,7 +21,7 @@ public class CodificadorCaracteristicas {
             return 0;
         }
 
-        // Dividir por espacios o comas
+        // dividir por espacios o comas
         String[] elementos = texto.split("[,\\s]+");
         return elementos.length;
     }
@@ -34,7 +31,7 @@ public class CodificadorCaracteristicas {
             return 0;
         }
 
-        // Contar llaves abiertas (cada objeto es un elemento)
+        // contar llaves abiertas (cada objeto es un elemento)
         return json.split("\\{").length - 1;
     }
 

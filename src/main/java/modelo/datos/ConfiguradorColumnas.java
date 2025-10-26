@@ -4,9 +4,7 @@ import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
 import java.io.IOException;
 
-/**
- * Responsabilidad: Configurar y mantener información sobre tipos de columnas
- */
+// Configurar y mantener información sobre tipos de columnas
 public class ConfiguradorColumnas {
 
     private static final String[] COLUMNAS_NUMERICAS = {
@@ -86,7 +84,7 @@ public class ConfiguradorColumnas {
         }
     }
 
-    // Getters
+    // getters
     public String[] getColumnasNumericas() {
         return COLUMNAS_NUMERICAS.clone();
     }
