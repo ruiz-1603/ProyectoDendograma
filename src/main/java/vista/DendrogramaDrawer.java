@@ -28,11 +28,11 @@ public class DendrogramaDrawer {
         panel.getChildren().clear();
         if (raiz == null) return;
 
-        // 1. Obtener etiquetas para calcular el diseño
+        // obtener etiquetas para calcular el diseño
         ListaDoble<String> etiquetasHojas = new ListaDoble<>();
         obtenerEtiquetasHojas(raiz, etiquetasHojas);
 
-        // 2. Calcular espaciado requerido basado en anchos de etiquetas
+        // calcular espaciado requerido basado en anchos de etiquetas
         double anchoMaximoEtiqueta = 0;
         for (int i = 0; i < etiquetasHojas.tamanio(); i++) {
             String etiqueta = etiquetasHojas.obtener(i);
@@ -42,13 +42,10 @@ public class DendrogramaDrawer {
         }
         double espaciadoHojas = Math.max(ESPACIADO_MINIMO_HOJAS, anchoMaximoEtiqueta);
 
-        // 3. Construir mapa de colores
         Diccionario<Nodo, Color> mapaColores = construirMapaColores(raiz, clustersParaColorear);
 
-        // 4. Calcular posiciones de nodos con nuevo espaciado
         Diccionario<Nodo, Point2D> posiciones = calcularPosicionesNodos(raiz, panel, espaciadoHojas);
 
-        // 5. Dibujar nodos con colores
         dibujarNodo(panel, raiz, posiciones, mapaColores);
     }
 
@@ -58,11 +55,11 @@ public class DendrogramaDrawer {
         if (clustersParaColorear == null || clustersParaColorear.tamanio() == 0) {
             colorearSubarbol(raiz, Color.WHITE, mapaColores);
         } else {
-            colorearSubarbol(raiz, Color.WHITE, mapaColores); // Comenzar con todo negro
+            colorearSubarbol(raiz, Color.WHITE, mapaColores);
             for (int i = 0; i < clustersParaColorear.tamanio(); i++) {
                 Nodo raizCluster = clustersParaColorear.obtener(i);
                 Color color = COLORES[i % COLORES.length];
-                colorearSubarbol(raizCluster, color, mapaColores); // Sobrescribir con colores específicos
+                colorearSubarbol(raizCluster, color, mapaColores);
             }
         }
         return mapaColores;
@@ -95,7 +92,6 @@ public class DendrogramaDrawer {
         Color color = mapaColores.contieneClave(nodo) ? mapaColores.obtener(nodo) : Color.WHITE;
 
         if (nodo.esHoja()) {
-            // Obtener las etiquetas de la hoja
             ListaDoble<String> elementos = nodo.getElementos();
             StringBuilder textoEtiqueta = new StringBuilder();
 
@@ -112,7 +108,7 @@ public class DendrogramaDrawer {
             etiqueta.setFill(color);
             etiqueta.setStyle("-fx-font-weight: bold;");
 
-            // Centrar la etiqueta horizontalmente
+            // centrar la etiqueta horizontalmente
             double anchoEtiqueta = etiqueta.getLayoutBounds().getWidth();
             etiqueta.setX(posicion.getX() - (anchoEtiqueta / 2));
             etiqueta.setY(posicion.getY() + TAMANO_FUENTE + 5);
@@ -201,11 +197,7 @@ public class DendrogramaDrawer {
         }
     }
 
-    // ========== CLASE AUXILIAR ==========
-
-    /**
-     * Reemplazo de AtomicInteger - contador simple
-     */
+    // clase auxiliar
     private static class ContadorHojas {
         private int valor;
 
