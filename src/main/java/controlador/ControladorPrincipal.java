@@ -34,7 +34,6 @@ public class ControladorPrincipal {
     @FXML private ComboBox<String> cmbDistancia;
     @FXML private ComboBox<String> cmbTipoEnlace;
     @FXML private Spinner<Integer> spinnerClusters;
-    @FXML private TextField txtDistanciaUmbral;
     
     @FXML private Pane paneDendrograma;
     @FXML private Button btnCargarCSV;
@@ -67,7 +66,6 @@ public class ControladorPrincipal {
 
         spinnerClusters.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, 1, 1));
         spinnerClusters.setDisable(true);
-        txtDistanciaUmbral.setDisable(true);
 
         btnConfigurarPesos.setDisable(true);
         btnSeleccionarVariables.setDisable(true);
@@ -210,12 +208,10 @@ public class ControladorPrincipal {
         new Thread(() -> {
             try {
                 javafx.application.Platform.runLater(() -> {
-                    lblEstado.setText("Ejecutando clustering...");
-        
-                    btnEjecutar.setDisable(true);
-                    txtDistanciaUmbral.setDisable(true);
-                    txtDistanciaUmbral.clear();
-                });
+                lblEstado.setText("Ejecutando clustering...");
+    
+                btnEjecutar.setDisable(true);
+            });
 
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
                 Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
@@ -250,7 +246,6 @@ public class ControladorPrincipal {
                     
                     btnEjecutar.setDisable(false);
                     btnExportarJSON.setDisable(false);
-                    txtDistanciaUmbral.setDisable(false);
                 });
 
             } catch (Exception e) {
@@ -264,40 +259,6 @@ public class ControladorPrincipal {
             }
         }).start();
     }
-
-    @FXML
-    public void onAplicarCorteDistancia() {
-        if (dendrogramaRaiz == null) {
-            mostrarError("Error", "Primero debe ejecutar el clustering para poder cortar por distancia.");
-            return;
-        }
-
-        String umbralStr = txtDistanciaUmbral.getText();
-        if (umbralStr == null || umbralStr.isBlank()) {
-            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, null);
-            return;
-        }
-
-        try {
-            double umbral = Double.parseDouble(umbralStr.replace(',', '.'));
-            if (umbral < 0) {
-                mostrarError("Error de validación", "La distancia umbral no puede ser negativa.");
-                return;
-            }
-
-            ListaDoble<Nodo> clustersLista = dendrograma.cortarPorDistancia(dendrogramaRaiz, umbral);
-
-            DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersLista);
-
-        } catch (NumberFormatException e) {
-            mostrarError("Error de formato", "Por favor, ingrese un número válido para la distancia umbral.");
-        } catch (Exception e) {
-            mostrarError("Error al cortar", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    
 
     @FXML
     private void onExportarJSON() {

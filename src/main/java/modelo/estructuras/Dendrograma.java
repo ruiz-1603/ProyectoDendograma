@@ -130,21 +130,4 @@ public class Dendrograma {
         }
         return max;
     }
-
-    public ListaDoble<Nodo> cortarPorDistancia(Nodo nodo, double umbral) {
-        ListaDoble<Nodo> clusters = new ListaDoble<>();
-        cortarPorDistanciaRec(nodo, umbral, clusters);
-        return clusters;
-    }
-
-    private void cortarPorDistanciaRec(Nodo nodo, double umbral, ListaDoble<Nodo> clusters) {
-        if (nodo == null) return;
-
-        if (nodo.getDistancia() > umbral && !nodo.esHoja()) {
-            cortarPorDistanciaRec(nodo.getIzquierdo(), umbral, clusters);
-            cortarPorDistanciaRec(nodo.getDerecho(), umbral, clusters);
-        } else {
-            clusters.agregar(nodo);
-        }
-    }
 }
