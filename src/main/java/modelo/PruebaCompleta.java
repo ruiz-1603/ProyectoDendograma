@@ -33,7 +33,7 @@ public class PruebaCompleta {
             System.out.println("PASO 1: Cargando datos desde CSV...");
             System.out.println("─".repeat(70));
             cargador = new CargadorCSV();
-            cargador.cargar("src/main/resources/movie_dataset.csv");
+            cargador.cargar("src/main/resources/movie_dataset.csv", 40);
             cargador.imprimirEstadisticas();
             System.out.println();
 

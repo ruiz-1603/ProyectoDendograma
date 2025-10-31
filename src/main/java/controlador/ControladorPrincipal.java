@@ -99,7 +99,8 @@ public class ControladorPrincipal {
 
 
             cargador = new CargadorCSV();
-            cargador.cargar(archivo.getAbsolutePath());
+            // limite = 0 || limite < 0 = sin limite
+            cargador.cargar(archivo.getAbsolutePath(), 40);
 
             vectores = cargador.getVectores();
 

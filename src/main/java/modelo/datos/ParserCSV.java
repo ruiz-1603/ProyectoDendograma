@@ -17,7 +17,8 @@ public class ParserCSV {
         this.filas = new ListaDoble<>();
     }
 
-    public void parsear(String rutaArchivo) throws IOException {
+    // si limite es 0 o negativo es para leer todas las lineas
+    public void parsear(String rutaArchivo, int limite) throws IOException {
         this.filas.limpiar();
 
         try (BufferedReader lector = new BufferedReader(
@@ -33,6 +34,9 @@ public class ParserCSV {
             String linea;
             int numeroLinea = 2;
             while ((linea = lector.readLine()) != null) {
+                if (limite > 0 && filas.tamanio() >= limite) {
+                    break;
+                }
                 if (linea.trim().isEmpty()) continue;
 
                 try {
@@ -90,7 +94,7 @@ public class ParserCSV {
             fila.poner(encabezados[i].trim(), valores[i].trim());
         }
 
-        // Rellenar con vacíos si faltan columnas
+        // se rellena con vacíos si faltan columnas
         for (int i = valores.length; i < encabezados.length; i++) {
             fila.poner(encabezados[i].trim(), "");
         }

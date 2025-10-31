@@ -27,11 +27,11 @@ public class CargadorCSV {
         this.rutaArchivo = "";
     }
 
-    public void cargar(String ruta) throws IOException {
+    public void cargar(String ruta, int limite) throws IOException {
         this.rutaArchivo = ruta;
 
         // parsear archivo CSV
-        parser.parsear(ruta);
+        parser.parsear(ruta, limite);
         datos = parser.getFilas();
 
         // configurar indices de columnas
