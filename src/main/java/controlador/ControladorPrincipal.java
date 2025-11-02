@@ -320,9 +320,7 @@ public class ControladorPrincipal {
         }
     }
 
-    /**
-     * Reemplaza String.join() - Une un array de cadenas con un delimitador
-     */
+
     private String unirCadenas(String[] cadenas, String delimitador) {
         if (cadenas == null || cadenas.length == 0) {
             return "";

@@ -21,7 +21,7 @@ public class ControladorVariables {
     public void inicializarDatos(String[] todasLasColumnas, String[] columnasYaSeleccionadas) {
         for (String columna : todasLasColumnas) {
             CheckBox checkBox = new CheckBox(columna);
-            checkBox.setSelected(false); // Deseleccionar por defecto
+            checkBox.setSelected(false);
 
             for (String seleccionada : columnasYaSeleccionadas) {
                 if (columna.equals(seleccionada)) {

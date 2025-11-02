@@ -4,7 +4,7 @@ import modelo.estructuras.Diccionario;
 import modelo.estructuras.IDiccionario;
 import java.io.IOException;
 
-// Configurar y mantener información sobre tipos de columnas
+// mantener información sobre tipos de columnas
 public class ConfiguradorColumnas {
 
     private static final String[] COLUMNAS_NUMERICAS = {

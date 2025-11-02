@@ -70,14 +70,6 @@ public class MotorCluster {
         return construirDendrograma(vectores, tipo);
     }
 
-    /**
-     * ALGORITMO PRINCIPAL: Clustering jerárquico aglomerativo
-     *
-     * Repite hasta tener un solo cluster:
-     * 1. Encuentra el par de clusters más cercano
-     * 2. Fusiona ese par en un nuevo cluster
-     * 3. Actualiza la matriz de distancias
-     */
     private void ejecutarAlgoritmo() {
         int iteracion = 0;
 

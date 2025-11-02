@@ -26,7 +26,7 @@ public class ExtractorCategorias {
                 }
             }
 
-            // si no hay valores únicos, agregar "desconocido"
+            // si no hay valores unicos
             if (unicos.tamanio() == 0) {
                 unicos.poner("desconocido", true);
             }
