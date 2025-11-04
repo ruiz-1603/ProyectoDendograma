@@ -15,7 +15,7 @@ public class Main extends Application {
         Pane root = fxmlLoader.load();
         Scene scene = new Scene(root, 1037, 628);
 
-        stage.setTitle("Sistema de Dendrograma y Clustering Jerárquico");
+        stage.setTitle("Dendrograma");
         stage.setScene(scene);
         stage.setMinWidth(800);
         stage.setMinHeight(600);

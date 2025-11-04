@@ -1,0 +1,434 @@
+{
+  "n": "([Avatar;The Avengers;John Carter;Batman v Superman: Dawn of Justice;Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful;The Golden Compass;Jurassic World;Superman Returns;Pirates of the Caribbean: On Stranger Tides;Pirates of the Caribbean: Dead Man's Chest;Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand;Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian;The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong;Spectre;Pirates of the Caribbean: At World's End;Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+  "d": 1.7716615264494902,
+  "c": [
+    {
+      "n": "Avatar",
+      "d": 0.0,
+      "c": []
+    },
+    {
+      "n": "([The Avengers;John Carter;Batman v Superman: Dawn of Justice;Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful;The Golden Compass;Jurassic World;Superman Returns;Pirates of the Caribbean: On Stranger Tides;Pirates of the Caribbean: Dead Man's Chest;Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand;Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian;The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong;Spectre;Pirates of the Caribbean: At World's End;Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+      "d": 0.9042077005555792,
+      "c": [
+        {
+          "n": "([The Avengers;John Carter;Batman v Superman: Dawn of Justice;Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful;The Golden Compass;Jurassic World;Superman Returns;Pirates of the Caribbean: On Stranger Tides])",
+          "d": 0.9042077005555792,
+          "c": [
+            {
+              "n": "([The Avengers;John Carter;Batman v Superman: Dawn of Justice])",
+              "d": 0.547612528803799,
+              "c": [
+                {
+                  "n": "The Avengers",
+                  "d": 0.0,
+                  "c": []
+                },
+                {
+                  "n": "([John Carter;Batman v Superman: Dawn of Justice])",
+                  "d": 0.547612528803799,
+                  "c": [
+                    {
+                      "n": "John Carter",
+                      "d": 0.0,
+                      "c": []
+                    },
+                    {
+                      "n": "Batman v Superman: Dawn of Justice",
+                      "d": 0.0,
+                      "c": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "([Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful;The Golden Compass;Jurassic World;Superman Returns;Pirates of the Caribbean: On Stranger Tides])",
+              "d": 0.547612528803799,
+              "c": [
+                {
+                  "n": "([Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful;The Golden Compass;Jurassic World])",
+                  "d": 0.46855730191643674,
+                  "c": [
+                    {
+                      "n": "([Skyfall;Iron Man 3;Monsters University;Oz: The Great and Powerful])",
+                      "d": 0.37711981299129144,
+                      "c": [
+                        {
+                          "n": "([Skyfall;Iron Man 3])",
+                          "d": 0.37711981299129144,
+                          "c": [
+                            {
+                              "n": "Skyfall",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "Iron Man 3",
+                              "d": 0.0,
+                              "c": []
+                            }
+                          ]
+                        },
+                        {
+                          "n": "([Monsters University;Oz: The Great and Powerful])",
+                          "d": 0.37711981299129144,
+                          "c": [
+                            {
+                              "n": "Monsters University",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "Oz: The Great and Powerful",
+                              "d": 0.0,
+                              "c": []
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "n": "([The Golden Compass;Jurassic World])",
+                      "d": 0.46855730191643674,
+                      "c": [
+                        {
+                          "n": "The Golden Compass",
+                          "d": 0.0,
+                          "c": []
+                        },
+                        {
+                          "n": "Jurassic World",
+                          "d": 0.0,
+                          "c": []
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "n": "([Superman Returns;Pirates of the Caribbean: On Stranger Tides])",
+                  "d": 0.547612528803799,
+                  "c": [
+                    {
+                      "n": "Superman Returns",
+                      "d": 0.0,
+                      "c": []
+                    },
+                    {
+                      "n": "Pirates of the Caribbean: On Stranger Tides",
+                      "d": 0.0,
+                      "c": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "n": "([Pirates of the Caribbean: Dead Man's Chest;Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand;Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian;The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong;Spectre;Pirates of the Caribbean: At World's End;Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+          "d": 0.9042077005555792,
+          "c": [
+            {
+              "n": "([Pirates of the Caribbean: Dead Man's Chest;Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand;Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian;The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+              "d": 0.547612528803799,
+              "c": [
+                {
+                  "n": "([Pirates of the Caribbean: Dead Man's Chest;Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand])",
+                  "d": 0.547612528803799,
+                  "c": [
+                    {
+                      "n": "Pirates of the Caribbean: Dead Man's Chest",
+                      "d": 0.0,
+                      "c": []
+                    },
+                    {
+                      "n": "([Titanic;Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand])",
+                      "d": 0.46855730191643674,
+                      "c": [
+                        {
+                          "n": "Titanic",
+                          "d": 0.0,
+                          "c": []
+                        },
+                        {
+                          "n": "([Transformers: Age of Extinction;TRON: Legacy;Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand])",
+                          "d": 0.37711981299129144,
+                          "c": [
+                            {
+                              "n": "([Transformers: Age of Extinction;TRON: Legacy])",
+                              "d": 0.37711981299129144,
+                              "c": [
+                                {
+                                  "n": "Transformers: Age of Extinction",
+                                  "d": 0.0,
+                                  "c": []
+                                },
+                                {
+                                  "n": "TRON: Legacy",
+                                  "d": 0.0,
+                                  "c": []
+                                }
+                              ]
+                            },
+                            {
+                              "n": "([Alice in Wonderland;Transformers: Revenge of the Fallen;The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand])",
+                              "d": 0.37711981299129144,
+                              "c": [
+                                {
+                                  "n": "([Alice in Wonderland;Transformers: Revenge of the Fallen])",
+                                  "d": 0.37711981299129144,
+                                  "c": [
+                                    {
+                                      "n": "Alice in Wonderland",
+                                      "d": 0.0,
+                                      "c": []
+                                    },
+                                    {
+                                      "n": "Transformers: Revenge of the Fallen",
+                                      "d": 0.0,
+                                      "c": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "n": "([The Amazing Spider-Man 2;Spider-Man 2;X-Men: The Last Stand])",
+                                  "d": 0.37711981299129144,
+                                  "c": [
+                                    {
+                                      "n": "The Amazing Spider-Man 2",
+                                      "d": 0.0,
+                                      "c": []
+                                    },
+                                    {
+                                      "n": "([Spider-Man 2;X-Men: The Last Stand])",
+                                      "d": 0.37711981299129144,
+                                      "c": [
+                                        {
+                                          "n": "Spider-Man 2",
+                                          "d": 0.0,
+                                          "c": []
+                                        },
+                                        {
+                                          "n": "X-Men: The Last Stand",
+                                          "d": 0.0,
+                                          "c": []
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "n": "([Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian;The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+                  "d": 0.547612528803799,
+                  "c": [
+                    {
+                      "n": "([Harry Potter and the Half-Blood Prince;The Chronicles of Narnia: Prince Caspian])",
+                      "d": 0.547612528803799,
+                      "c": [
+                        {
+                          "n": "Harry Potter and the Half-Blood Prince",
+                          "d": 0.0,
+                          "c": []
+                        },
+                        {
+                          "n": "The Chronicles of Narnia: Prince Caspian",
+                          "d": 0.0,
+                          "c": []
+                        }
+                      ]
+                    },
+                    {
+                      "n": "([The Dark Knight Rises;Avengers: Age of Ultron;Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+                      "d": 0.547612528803799,
+                      "c": [
+                        {
+                          "n": "([The Dark Knight Rises;Avengers: Age of Ultron])",
+                          "d": 0.547612528803799,
+                          "c": [
+                            {
+                              "n": "The Dark Knight Rises",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "Avengers: Age of Ultron",
+                              "d": 0.0,
+                              "c": []
+                            }
+                          ]
+                        },
+                        {
+                          "n": "([Man of Steel;Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+                          "d": 0.547612528803799,
+                          "c": [
+                            {
+                              "n": "Man of Steel",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "([Robin Hood;Captain America: Civil War;The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+                              "d": 0.46855730191643674,
+                              "c": [
+                                {
+                                  "n": "([Robin Hood;Captain America: Civil War])",
+                                  "d": 0.46855730191643674,
+                                  "c": [
+                                    {
+                                      "n": "Robin Hood",
+                                      "d": 0.0,
+                                      "c": []
+                                    },
+                                    {
+                                      "n": "Captain America: Civil War",
+                                      "d": 0.0,
+                                      "c": []
+                                    }
+                                  ]
+                                },
+                                {
+                                  "n": "([The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug;Battleship;The Amazing Spider-Man;King Kong])",
+                                  "d": 0.46855730191643674,
+                                  "c": [
+                                    {
+                                      "n": "([The Hobbit: The Battle of the Five Armies;The Hobbit: The Desolation of Smaug])",
+                                      "d": 0.46855730191643674,
+                                      "c": [
+                                        {
+                                          "n": "The Hobbit: The Battle of the Five Armies",
+                                          "d": 0.0,
+                                          "c": []
+                                        },
+                                        {
+                                          "n": "The Hobbit: The Desolation of Smaug",
+                                          "d": 0.0,
+                                          "c": []
+                                        }
+                                      ]
+                                    },
+                                    {
+                                      "n": "([Battleship;The Amazing Spider-Man;King Kong])",
+                                      "d": 0.46855730191643674,
+                                      "c": [
+                                        {
+                                          "n": "Battleship",
+                                          "d": 0.0,
+                                          "c": []
+                                        },
+                                        {
+                                          "n": "([The Amazing Spider-Man;King Kong])",
+                                          "d": 0.46855730191643674,
+                                          "c": [
+                                            {
+                                              "n": "The Amazing Spider-Man",
+                                              "d": 0.0,
+                                              "c": []
+                                            },
+                                            {
+                                              "n": "King Kong",
+                                              "d": 0.0,
+                                              "c": []
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "n": "([Spectre;Pirates of the Caribbean: At World's End;Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+              "d": 0.6751607898147624,
+              "c": [
+                {
+                  "n": "Spectre",
+                  "d": 0.0,
+                  "c": []
+                },
+                {
+                  "n": "([Pirates of the Caribbean: At World's End;Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+                  "d": 0.6751607898147624,
+                  "c": [
+                    {
+                      "n": "Pirates of the Caribbean: At World's End",
+                      "d": 0.0,
+                      "c": []
+                    },
+                    {
+                      "n": "([Spider-Man 3;Quantum of Solace;Men in Black 3;Tangled;The Lone Ranger])",
+                      "d": 0.547612528803799,
+                      "c": [
+                        {
+                          "n": "([Spider-Man 3;Quantum of Solace])",
+                          "d": 0.547612528803799,
+                          "c": [
+                            {
+                              "n": "Spider-Man 3",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "Quantum of Solace",
+                              "d": 0.0,
+                              "c": []
+                            }
+                          ]
+                        },
+                        {
+                          "n": "([Men in Black 3;Tangled;The Lone Ranger])",
+                          "d": 0.547612528803799,
+                          "c": [
+                            {
+                              "n": "Men in Black 3",
+                              "d": 0.0,
+                              "c": []
+                            },
+                            {
+                              "n": "([Tangled;The Lone Ranger])",
+                              "d": 0.547612528803799,
+                              "c": [
+                                {
+                                  "n": "Tangled",
+                                  "d": 0.0,
+                                  "c": []
+                                },
+                                {
+                                  "n": "The Lone Ranger",
+                                  "d": 0.0,
+                                  "c": []
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
