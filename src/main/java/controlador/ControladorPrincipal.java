@@ -4,21 +4,19 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-
 import modelo.datos.CargadorCSV;
 import modelo.datos.SelectorColumnas;
-import modelo.estructuras.Vector;
-import modelo.estructuras.Nodo;
-import modelo.estructuras.Dendrograma;
-import modelo.estructuras.ListaDoble;
-import modelo.normalizacion.Normalizador;
-import modelo.normalizacion.FactoryNormalizacion;
+import modelo.datos.TransformadorDatos;
+import modelo.datos.VariableConfig;
 import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
+import modelo.estructuras.Dendrograma;
+import modelo.estructuras.ListaDoble;
+import modelo.estructuras.Nodo;
+import modelo.estructuras.Vector;
 import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
 
@@ -29,17 +27,14 @@ import java.io.IOException;
 public class ControladorPrincipal {
 
     @FXML private Label lblArchivoSeleccionado;
-    @FXML private ComboBox<String> cmbNormalizacion;
     @FXML private ComboBox<String> cmbDistancia;
     @FXML private ComboBox<String> cmbTipoEnlace;
     @FXML private Spinner<Integer> spinnerClusters;
-    
     
     @FXML private Button btnCargarCSV;
     @FXML private Button btnConfigurarPesos;
     @FXML private Button btnSeleccionarVariables;
     @FXML private Button btnEjecutar;
-    
     
     @FXML private Label lblEstado;
 
@@ -50,13 +45,11 @@ public class ControladorPrincipal {
     private Nodo dendrogramaRaiz;
     private Dendrograma dendrograma;
     private File archivoCSV;
+    private ListaDoble<VariableConfig> configs;
     
 
     @FXML
     public void initialize() {
-        cmbNormalizacion.getItems().addAll("Min-Max", "Z-Score", "Logarítmica");
-        cmbNormalizacion.setValue("Min-Max");
-
         cmbDistancia.getItems().addAll("Euclidiana", "Manhattan", "Coseno", "Hamming");
         cmbDistancia.setValue("Euclidiana");
 
@@ -95,14 +88,14 @@ public class ControladorPrincipal {
         try {
             lblEstado.setText("Cargando archivo CSV...");
 
-
             cargador = new CargadorCSV();
-            // limite = 0 || limite < 0 = sin limite
-            cargador.cargar(archivo.getAbsolutePath(), 40);
+            cargador.cargar(archivo.getAbsolutePath(), 0);
 
             vectores = cargador.getVectores();
-
             selector = new SelectorColumnas(cargador.getNombresDimensiones());
+            
+            // La configuración ahora se basa en los nombres de dimensiones finales
+            this.configs = null; 
 
             double[] pesos = new double[cargador.getDimensiones()];
             for (int i = 0; i < pesos.length; i++) {
@@ -111,7 +104,6 @@ public class ControladorPrincipal {
             ponderador = new Ponderador(pesos, cargador.getNombresDimensiones());
 
             lblArchivoSeleccionado.setText(archivo.getName());
-
 
             btnConfigurarPesos.setDisable(false);
             btnSeleccionarVariables.setDisable(false);
@@ -174,15 +166,31 @@ public class ControladorPrincipal {
             stage.setMinHeight(400);
 
             ControladorVariables controller = loader.getController();
-            controller.inicializarDatos(selector.getTodasLasColumnas(), selector.getColumnasSeleccionadas());
+            // Pasamos los nombres finales de las dimensiones
+            controller.inicializarDatos(cargador.getNombresDimensiones(), this.configs);
 
             stage.showAndWait();
 
             if (controller.isGuardado()) {
+                this.configs = controller.getConfigs();
+
+                // La lógica de traducción ya no es necesaria, los nombres en configs son los finales
+                ListaDoble<String> finalNamesToSelect = new ListaDoble<>();
+                for (int i = 0; i < configs.tamanio(); i++) {
+                    VariableConfig config = configs.obtener(i);
+                    if (config.isSeleccionada()) {
+                        finalNamesToSelect.agregar(config.getNombre());
+                    }
+                }
+
+                String[] finalNamesArray = new String[finalNamesToSelect.tamanio()];
+                for (int i = 0; i < finalNamesToSelect.tamanio(); i++) {
+                    finalNamesArray[i] = finalNamesToSelect.obtener(i);
+                }
+
                 selector.ignorarTodas();
-                selector.seleccionarMultiples(controller.getColumnasSeleccionadas());
+                selector.seleccionarMultiples(finalNamesArray);
                 lblEstado.setText("Selección de variables actualizada.");
-    
             }
 
         } catch (IOException e) {
@@ -215,9 +223,11 @@ public class ControladorPrincipal {
                 Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
                 Vector[] vectoresPonderados = ponderadorFiltrado.aplicarPesos(vectoresSeleccionados);
 
-                FactoryNormalizacion.TipoNormalizacion tipoNorm = obtenerTipoNormalizacion();
-                Normalizador normalizador = new Normalizador(tipoNorm);
-                Vector[] vectoresNormalizados = normalizador.normalizar(vectoresPonderados);
+                // --- Nueva Lógica de Normalización ---
+                String[] nombresColumnasSeleccionadas = selector.getColumnasSeleccionadas();
+                TransformadorDatos transformador = new TransformadorDatos(this.configs, nombresColumnasSeleccionadas);
+                Vector[] vectoresNormalizados = transformador.normalizarPorVariable(vectoresPonderados);
+                // --- Fin Nueva Lógica ---
 
                 FactoryDistancia.TipoDistancia tipoDist = obtenerTipoDistancia();
                 CalculadorMatrizDistancia calculador = new CalculadorMatrizDistancia();
@@ -227,7 +237,6 @@ public class ControladorPrincipal {
                 MotorCluster motor = new MotorCluster(tipoEnlace);
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
 
-                // Generar y guardar JSON automáticamente
                 if (dendrogramaRaiz != null) {
                     try (FileWriter writer = new FileWriter("dendrograma.json")) {
                         String json = dendrograma.toJSON(dendrogramaRaiz);
@@ -254,18 +263,6 @@ public class ControladorPrincipal {
         }).start();
     }
 
-    
-
-    
-
-    private FactoryNormalizacion.TipoNormalizacion obtenerTipoNormalizacion() {
-        switch (cmbNormalizacion.getValue()) {
-            case "Z-Score": return FactoryNormalizacion.TipoNormalizacion.Z_SCORE;
-            case "Logarítmica": return FactoryNormalizacion.TipoNormalizacion.LOGARITMICA;
-            default: return FactoryNormalizacion.TipoNormalizacion.MIN_MAX;
-        }
-    }
-
     private FactoryDistancia.TipoDistancia obtenerTipoDistancia() {
         switch (cmbDistancia.getValue()) {
             case "Manhattan": return FactoryDistancia.TipoDistancia.MANHATTAN;
@@ -282,22 +279,6 @@ public class ControladorPrincipal {
             case "Centroide": return MotorCluster.TipoEnlace.CENTROIDE;
             default: return MotorCluster.TipoEnlace.PROMEDIO;
         }
-    }
-
-
-    private String unirCadenas(String[] cadenas, String delimitador) {
-        if (cadenas == null || cadenas.length == 0) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(cadenas[0]);
-
-        for (int i = 1; i < cadenas.length; i++) {
-            sb.append(delimitador).append(cadenas[i]);
-        }
-
-        return sb.toString();
     }
 
     private void mostrarError(String titulo, String mensaje) {

@@ -3,6 +3,9 @@ package modelo.datos;
 import modelo.estructuras.IDiccionario;
 import modelo.estructuras.Vector;
 import modelo.estructuras.ListaDoble;
+import modelo.estructuras.Diccionario;
+import modelo.normalizacion.FactoryNormalizacion;
+import modelo.normalizacion.INormalizacion;
 
 public class TransformadorDatos {
 
@@ -10,6 +13,9 @@ public class TransformadorDatos {
     private ExtractorCategorias extractorCategorias;
     private NormalizadorFecha normalizadorFechas;
     private CodificadorCaracteristicas codificador;
+
+    private ListaDoble<VariableConfig> configs;
+    private String[] nombresColumnas;
 
     public TransformadorDatos(ConfiguradorColumnas configurador,
                               ExtractorCategorias extractorCategorias,
@@ -20,10 +26,76 @@ public class TransformadorDatos {
         this.codificador = new CodificadorCaracteristicas();
     }
 
+    public TransformadorDatos(ListaDoble<VariableConfig> configs, String[] nombresColumnas) {
+        this.configs = configs;
+        this.nombresColumnas = nombresColumnas;
+    }
+
+    public Vector[] normalizarPorVariable(Vector[] vectores) {
+        if (vectores == null || vectores.length == 0) {
+            return new Vector[0];
+        }
+
+        Vector[] vectoresNormalizados = new Vector[vectores.length];
+        for (int i = 0; i < vectores.length; i++) {
+            vectoresNormalizados[i] = new Vector(vectores[i]);
+        }
+
+        IDiccionario<String, Integer> mapaNombresAIndices = new Diccionario<>();
+        for (int i = 0; i < nombresColumnas.length; i++) {
+            mapaNombresAIndices.poner(nombresColumnas[i], i);
+        }
+
+        IDiccionario<String, ListaDoble<Integer>> indicesPorMetodo = new Diccionario<>();
+        for (int i = 0; i < configs.tamanio(); i++) {
+            VariableConfig config = configs.obtener(i);
+            if (config.isSeleccionada() && !"Ninguno".equals(config.getMetodoNormalizacion()) && "Numérico".equals(config.getTipoDato())) {
+                String metodo = config.getMetodoNormalizacion();
+                if (indicesPorMetodo.obtener(metodo) == null) {
+                    indicesPorMetodo.poner(metodo, new ListaDoble<>());
+                }
+                Integer indice = mapaNombresAIndices.obtener(config.getNombre());
+                if (indice != null) {
+                    indicesPorMetodo.obtener(metodo).agregar(indice);
+                }
+            }
+        }
+
+        ListaDoble<String> metodos = indicesPorMetodo.conjuntoClaves();
+        for (int i = 0; i < metodos.tamanio(); i++) {
+            String metodo = metodos.obtener(i);
+            ListaDoble<Integer> indices = indicesPorMetodo.obtener(metodo);
+            int numColumnas = indices.tamanio();
+
+            if (numColumnas == 0) continue;
+
+            Vector[] subVectores = new Vector[vectores.length];
+            for (int j = 0; j < vectores.length; j++) {
+                double[] subDatos = new double[numColumnas];
+                for (int k = 0; k < numColumnas; k++) {
+                    subDatos[k] = vectores[j].getPosicion(indices.obtener(k));
+                }
+                subVectores[j] = new Vector(subDatos, "");
+            }
+
+            INormalizacion estrategia = FactoryNormalizacion.crear(metodo);
+            Vector[] subVectoresNormalizados = estrategia.normalizar(subVectores);
+
+            for (int j = 0; j < vectoresNormalizados.length; j++) {
+                for (int k = 0; k < numColumnas; k++) {
+                    double valorNormalizado = subVectoresNormalizados[j].getPosicion(k);
+                    vectoresNormalizados[j].setValor(indices.obtener(k), valorNormalizado);
+                }
+            }
+        }
+
+        return vectoresNormalizados;
+    }
+
     public Vector[] transformar(ListaDoble<IDiccionario<String, String>> filas) {
         ListaDoble<Vector> vectores = new ListaDoble<>();
 
-        for (int k = 0; k < filas.tamanio(); k++) { // Changed to indexed loop for ListaDoble
+        for (int k = 0; k < filas.tamanio(); k++) {
             IDiccionario<String, String> fila = filas.obtener(k);
             String identificador = fila.obtener(configurador.getColumnaIdentificador());
             if (identificador == null || identificador.isEmpty()) {
@@ -32,22 +104,12 @@ public class TransformadorDatos {
 
             ListaDoble<Double> datosVector = new ListaDoble<>();
 
-            // columnas numéricas directas
             agregarColumnasNumericas(fila, datosVector);
-
-            // columnas categóricas (one-hot)
             agregarColumnasCategoricas(fila, datosVector);
-
-            // columnas de conteo (texto)
             agregarColumnasConteo(fila, datosVector);
-
-            // columnas de JSON array
             agregarColumnasJsonArray(fila, datosVector);
-
-            // columna de fecha (normalizada)
             agregarColumnaFecha(fila, datosVector);
 
-            // crear vector
             double[] datos = new double[datosVector.tamanio()];
             for (int i = 0; i < datosVector.tamanio(); i++) {
                 datos[i] = datosVector.obtener(i);

@@ -89,6 +89,13 @@ public class CargadorCSV {
         return generadorNombres.generar();
     }
 
+    public String[] getEncabezados() {
+        if (parser == null) {
+            return new String[0];
+        }
+        return parser.getEncabezados();
+    }
+
     public void imprimirEstadisticas() {
         System.out.println("Estadísticas del CSV");
         System.out.println("Archivo: " + rutaArchivo);

@@ -21,7 +21,7 @@ public class ExtractorCategorias {
             for (int i = 0; i < filas.tamanio(); i++) {
                 IDiccionario<String, String> fila = filas.obtener(i);
                 String valor = fila.obtener(columna);
-                if (valor != null && !valor.isEmpty() && !valor.equals("null")) {
+                if (valor != null && !valor.isEmpty() && !valor.equals("null") && !valor.contains(" ") && valor.length() < 25) {
                     unicos.poner(valor.trim(), true);
                 }
             }
