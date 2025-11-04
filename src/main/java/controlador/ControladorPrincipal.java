@@ -21,7 +21,6 @@ import modelo.distancias.CalculadorMatrizDistancia;
 import modelo.distancias.FactoryDistancia;
 import modelo.clustering.MotorCluster;
 import modelo.clustering.Ponderador;
-import vista.DendrogramaDrawer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -35,12 +34,12 @@ public class ControladorPrincipal {
     @FXML private ComboBox<String> cmbTipoEnlace;
     @FXML private Spinner<Integer> spinnerClusters;
     
-    @FXML private Pane paneDendrograma;
+    
     @FXML private Button btnCargarCSV;
     @FXML private Button btnConfigurarPesos;
     @FXML private Button btnSeleccionarVariables;
     @FXML private Button btnEjecutar;
-    @FXML private Button btnExportarJSON;
+    
     
     @FXML private Label lblEstado;
 
@@ -70,7 +69,6 @@ public class ControladorPrincipal {
         btnConfigurarPesos.setDisable(true);
         btnSeleccionarVariables.setDisable(true);
         btnEjecutar.setDisable(true);
-        btnExportarJSON.setDisable(true);
 
         lblEstado.setText("Esperando carga de archivo CSV...");
 
@@ -209,10 +207,9 @@ public class ControladorPrincipal {
         new Thread(() -> {
             try {
                 javafx.application.Platform.runLater(() -> {
-                lblEstado.setText("Ejecutando clustering...");
-    
-                btnEjecutar.setDisable(true);
-            });
+                    lblEstado.setText("Ejecutando clustering y generando JSON...");
+                    btnEjecutar.setDisable(true);
+                });
 
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
                 Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
@@ -230,30 +227,26 @@ public class ControladorPrincipal {
                 MotorCluster motor = new MotorCluster(tipoEnlace);
                 dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
 
-                javafx.application.Platform.runLater(() -> {
-                    ListaDoble<Nodo> clustersParaColorear = null;
-
-                    if (k > 1 && dendrogramaRaiz != null) {
-                        try {
-                            clustersParaColorear = dendrograma.cortarArbol(dendrogramaRaiz, k);
-                        } catch (Exception e) {
-                            mostrarError("Error al cortar el árbol", e.getMessage());
-                        }
+                // Generar y guardar JSON automáticamente
+                if (dendrogramaRaiz != null) {
+                    try (FileWriter writer = new FileWriter("dendrograma.json")) {
+                        String json = dendrograma.toJSON(dendrogramaRaiz);
+                        writer.write(json);
+                        javafx.application.Platform.runLater(() -> {
+                            mostrarInformacion("Exportación automática", "JSON guardado en la raíz del proyecto como 'dendrograma.json'");
+                            lblEstado.setText("Clustering completado. JSON exportado.");
+                        });
+                    } catch (IOException e) {
+                        javafx.application.Platform.runLater(() -> mostrarError("Error al exportar JSON", e.getMessage()));
                     }
+                }
 
-                    DendrogramaDrawer.draw(paneDendrograma, dendrogramaRaiz, clustersParaColorear);
-
-                    lblEstado.setText("Clustering completado");
-                    
-                    btnEjecutar.setDisable(false);
-                    btnExportarJSON.setDisable(false);
-                });
+                javafx.application.Platform.runLater(() -> btnEjecutar.setDisable(false));
 
             } catch (Exception e) {
                 javafx.application.Platform.runLater(() -> {
                     mostrarError("Error en clustering", e.getMessage());
                     lblEstado.setText("Error en clustering");
-                    
                     btnEjecutar.setDisable(false);
                     e.printStackTrace();
                 });
@@ -261,36 +254,7 @@ public class ControladorPrincipal {
         }).start();
     }
 
-    @FXML
-    private void onExportarJSON() {
-        if (dendrogramaRaiz == null) {
-            mostrarError("Error", "Primero debe ejecutar el clustering");
-            return;
-        }
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Guardar dendrograma como JSON");
-        fileChooser.setInitialFileName("dendrograma.json");
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("JSON", "*.json")
-        );
-
-        Stage stage = (Stage) btnExportarJSON.getScene().getWindow();
-        File archivo = fileChooser.showSaveDialog(stage);
-
-        if (archivo != null) {
-            try (FileWriter writer = new FileWriter(archivo)) {
-                String json = dendrograma.toJSON(dendrogramaRaiz);
-                writer.write(json);
-                mostrarInformacion("Exportación exitosa",
-                        "JSON guardado en:\n" + archivo.getAbsolutePath());
-                lblEstado.setText("JSON exportado correctamente");
-
-            } catch (IOException e) {
-                mostrarError("Error al exportar", e.getMessage());
-            }
-        }
-    }
+    
 
     
 
