@@ -89,7 +89,7 @@ public class ControladorPrincipal {
             lblEstado.setText("Cargando archivo CSV...");
 
             cargador = new CargadorCSV();
-            cargador.cargar(archivo.getAbsolutePath(), 0);
+            cargador.cargar(archivo.getAbsolutePath(), 70);
 
             vectores = cargador.getVectores();
             selector = new SelectorColumnas(cargador.getNombresDimensiones());
