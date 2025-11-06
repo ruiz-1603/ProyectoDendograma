@@ -220,23 +220,21 @@ public class ControladorPrincipal {
                 });
 
                 Vector[] vectoresSeleccionados = selector.aplicarSeleccion(vectores);
-                Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
-                Vector[] vectoresPonderados = ponderadorFiltrado.aplicarPesos(vectoresSeleccionados);
 
-                // --- Nueva Lógica de Normalización ---
                 String[] nombresColumnasSeleccionadas = selector.getColumnasSeleccionadas();
                 TransformadorDatos transformador = new TransformadorDatos(this.configs, nombresColumnasSeleccionadas);
-                Vector[] vectoresNormalizados = transformador.normalizarPorVariable(vectoresPonderados);
-                // --- Fin Nueva Lógica ---
+                Vector[] vectoresNormalizados = transformador.normalizarPorVariable(vectoresSeleccionados);
+
+                Ponderador ponderadorFiltrado = ponderador.filtrarPesos(selector);
+                Vector[] vectoresPonderados = ponderadorFiltrado.aplicarPesos(vectoresNormalizados);
 
                 FactoryDistancia.TipoDistancia tipoDist = obtenerTipoDistancia();
                 CalculadorMatrizDistancia calculador = new CalculadorMatrizDistancia();
-                calculador.calcular(vectoresNormalizados, tipoDist);
+                calculador.calcular(vectoresPonderados, tipoDist);
 
                 MotorCluster.TipoEnlace tipoEnlace = obtenerTipoEnlace();
                 MotorCluster motor = new MotorCluster(tipoEnlace);
-                dendrogramaRaiz = motor.construirDendrograma(vectoresNormalizados, tipoDist);
-
+                dendrogramaRaiz = motor.construirDendrograma(vectoresPonderados, tipoDist);
                 if (dendrogramaRaiz != null) {
                     try (FileWriter writer = new FileWriter("dendrograma.json")) {
                         String json = dendrograma.toJSON(dendrogramaRaiz);
