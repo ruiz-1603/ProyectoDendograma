@@ -65,7 +65,7 @@ public class ControladorPrincipal {
 
         lblEstado.setText("Esperando carga de archivo CSV...");
 
-        dendrograma = new Dendrograma();
+        dendrograma = Dendrograma.getInstancia();
     }
 
     @FXML

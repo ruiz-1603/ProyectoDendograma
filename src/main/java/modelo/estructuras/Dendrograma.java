@@ -1,6 +1,19 @@
 package modelo.estructuras;
 
 public class Dendrograma {
+    private static Dendrograma instancia;
+
+    private Dendrograma() {
+
+    }
+
+    public static Dendrograma getInstancia() {
+        if (instancia == null) {
+            instancia = new Dendrograma();
+        }
+        return instancia;
+    }
+
     public String toJSON(Nodo raiz) {
         return toJSONRec(raiz,0);
     }
