@@ -108,7 +108,7 @@ public class TransformadorDatos {
             agregarColumnasCategoricas(fila, datosVector);
             agregarColumnasConteo(fila, datosVector);
             agregarColumnasJsonArray(fila, datosVector);
-            agregarColumnaFecha(fila, datosVector);
+            agregarColumnaFechaSinNormalizar(fila, datosVector);
 
             double[] datos = new double[datosVector.tamanio()];
             for (int i = 0; i < datosVector.tamanio(); i++) {
@@ -162,9 +162,10 @@ public class TransformadorDatos {
         }
     }
 
-    private void agregarColumnaFecha(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
+    private void agregarColumnaFechaSinNormalizar(IDiccionario<String, String> fila, ListaDoble<Double> datosVector) {
         String fechaStr = fila.obtener(configurador.getColumnaFecha());
-        double fechaNormalizada = normalizadorFechas.normalizar(fechaStr);
-        datosVector.agregar(fechaNormalizada);
+        double fechaEnDias = normalizadorFechas.convertirANumero(fechaStr);
+        datosVector.agregar(fechaEnDias);
     }
+
 }

@@ -62,24 +62,19 @@ public class NormalizadorFecha {
         return max;
     }
 
-    public double normalizar(String fechaStr) {
+    public double convertirANumero(String fechaStr) {
         if (fechaStr == null || fechaStr.isEmpty() || fechaStr.equals("null")) {
-            return 0.5; // Valor medio si es nula
+            long diasDesdeMinimo = java.time.temporal.ChronoUnit.DAYS.between(fechaMinima, fechaMaxima) / 2;
+            return (double) diasDesdeMinimo;
         }
 
         try {
             LocalDate fecha = LocalDate.parse(fechaStr.trim(), formateador);
-
             long diasDesdeMinimo = java.time.temporal.ChronoUnit.DAYS.between(fechaMinima, fecha);
-            long diasTotales = java.time.temporal.ChronoUnit.DAYS.between(fechaMinima, fechaMaxima);
-
-            if (diasTotales == 0) {
-                return 0.5;
-            }
-
-            return (double) diasDesdeMinimo / diasTotales;
+            return (double) diasDesdeMinimo;
         } catch (Exception e) {
-            return 0.5;
+            long diasDesdeMinimo = java.time.temporal.ChronoUnit.DAYS.between(fechaMinima, fechaMaxima) / 2;
+            return (double) diasDesdeMinimo;
         }
     }
 
