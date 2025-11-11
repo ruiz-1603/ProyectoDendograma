@@ -17,7 +17,7 @@ public class MotorCluster {
     private Matriz matrizDistancias;
     private CalculadorMatrizDistancia calculadorMatriz;
 
-    private CalculadorLanceWilliams calculadorLanceWilliams;
+    private ActualizadorMatrizDistancias actualizadorMatriz;
     private FusionadorCluster fusionador;
 
     public MotorCluster() {
@@ -26,7 +26,7 @@ public class MotorCluster {
 
     public MotorCluster(TipoEnlace tipoEnlace) {
         this.calculadorMatriz = new CalculadorMatrizDistancia();
-        this.calculadorLanceWilliams = new CalculadorLanceWilliams(
+        this.actualizadorMatriz = new ActualizadorMatrizDistancias(
                 convertirTipoEnlace(tipoEnlace)
         );
         this.fusionador = new FusionadorCluster();
@@ -84,7 +84,7 @@ public class MotorCluster {
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
 
             // actualizar matriz de distancias usando Lance-Williams
-            calculadorLanceWilliams.actualizarMatriz(
+            actualizadorMatriz.actualizarMatriz(
                     matrizDistancias,
                     i, j,
                     distanciaFusion,
@@ -104,17 +104,17 @@ public class MotorCluster {
         return etiquetas;
     }
 
-    private CalculadorLanceWilliams.TipoEnlace convertirTipoEnlace(TipoEnlace tipo) {
+    private ActualizadorMatrizDistancias.TipoEnlace convertirTipoEnlace(TipoEnlace tipo) {
         switch (tipo) {
-            case MINIMO: return CalculadorLanceWilliams.TipoEnlace.MINIMO;
-            case MAXIMO: return CalculadorLanceWilliams.TipoEnlace.MAXIMO;
-            case PROMEDIO: return CalculadorLanceWilliams.TipoEnlace.PROMEDIO;
-            case CENTROIDE: return CalculadorLanceWilliams.TipoEnlace.CENTROIDE;
+            case MINIMO: return ActualizadorMatrizDistancias.TipoEnlace.MINIMO;
+            case MAXIMO: return ActualizadorMatrizDistancias.TipoEnlace.MAXIMO;
+            case PROMEDIO: return ActualizadorMatrizDistancias.TipoEnlace.PROMEDIO;
+            case CENTROIDE: return ActualizadorMatrizDistancias.TipoEnlace.CENTROIDE;
             default: throw new IllegalArgumentException("Tipo de enlace no soportado");
         }
     }
 
-    private TipoEnlace convertirDesdeLanceWilliams(CalculadorLanceWilliams.TipoEnlace tipoLW) {
+    private TipoEnlace convertirDesdeActualizador(ActualizadorMatrizDistancias.TipoEnlace tipoLW) {
         switch (tipoLW) {
             case MINIMO: return TipoEnlace.MINIMO;
             case MAXIMO: return TipoEnlace.MAXIMO;
@@ -125,11 +125,11 @@ public class MotorCluster {
     }
 
     public void setTipoEnlace(TipoEnlace tipo) {
-        calculadorLanceWilliams.setTipoEnlace(convertirTipoEnlace(tipo));
+        actualizadorMatriz.setTipoEnlace(convertirTipoEnlace(tipo));
     }
 
     public TipoEnlace getTipoEnlace() {
-        return convertirDesdeLanceWilliams(calculadorLanceWilliams.getTipoEnlace());
+        return convertirDesdeActualizador(actualizadorMatriz.getTipoEnlace());
     }
 
     public void imprimirDendrograma(Nodo raiz) {

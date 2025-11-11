@@ -2,7 +2,7 @@ package modelo.clustering;
 
 import modelo.estructuras.Matriz;
 
-public class CalculadorLanceWilliams {
+public class ActualizadorMatrizDistancias {
 
     public enum TipoEnlace {
         MINIMO,
@@ -13,7 +13,7 @@ public class CalculadorLanceWilliams {
 
     private TipoEnlace tipoEnlace;
 
-    public CalculadorLanceWilliams(TipoEnlace tipoEnlace) {
+    public ActualizadorMatrizDistancias(TipoEnlace tipoEnlace) {
         this.tipoEnlace = tipoEnlace;
     }
 
@@ -23,7 +23,7 @@ public class CalculadorLanceWilliams {
         int ni = tamanoClusters[i];
         int nj = tamanoClusters[j];
 
-        ParametrosLanceWilliams params = calcularParametros(ni, nj);
+        ParametrosActualizacion params = calcularParametros(ni, nj);
 
         for (int k = 0; k < numeroClusters; k++) {
             if (k == i || k == j) continue;
@@ -40,7 +40,7 @@ public class CalculadorLanceWilliams {
         }
     }
 
-    private ParametrosLanceWilliams calcularParametros(int ni, int nj) {
+    private ParametrosActualizacion calcularParametros(int ni, int nj) {
         double alphaI, alphaJ, gamma;
 
         switch (tipoEnlace) {
@@ -72,7 +72,7 @@ public class CalculadorLanceWilliams {
                 throw new IllegalArgumentException("Tipo de enlace no soportado");
         }
 
-        return new ParametrosLanceWilliams(alphaI, alphaJ, gamma);
+        return new ParametrosActualizacion(alphaI, alphaJ, gamma);
     }
 
     public TipoEnlace getTipoEnlace() {
@@ -84,12 +84,12 @@ public class CalculadorLanceWilliams {
     }
 
     // clase interna para almacenar parametros de Lance-Williams
-    private static class ParametrosLanceWilliams {
+    private static class ParametrosActualizacion {
         final double alphaI;
         final double alphaJ;
         final double gamma;
 
-        ParametrosLanceWilliams(double alphaI, double alphaJ, double gamma) {
+        ParametrosActualizacion(double alphaI, double alphaJ, double gamma) {
             this.alphaI = alphaI;
             this.alphaJ = alphaJ;
             this.gamma = gamma;
@@ -98,6 +98,6 @@ public class CalculadorLanceWilliams {
 
     @Override
     public String toString() {
-        return "CalculadorLanceWilliams [tipo=" + tipoEnlace + "]";
+        return "ActualizadorMatrizDistancias [tipo=" + tipoEnlace + "]";
     }
 }
