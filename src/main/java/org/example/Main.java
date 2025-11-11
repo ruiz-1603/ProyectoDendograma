@@ -11,7 +11,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/vista/pantalla-principal-og.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/org/example/vista/pantalla-principal.fxml"));
         Pane root = fxmlLoader.load();
         Scene scene = new Scene(root, 1037, 628);
 

@@ -19,7 +19,6 @@ public class MotorCluster {
 
     private CalculadorLanceWilliams calculadorLanceWilliams;
     private FusionadorCluster fusionador;
-    private EstadisticasCluster estadisticas;
 
     public MotorCluster() {
         this(TipoEnlace.PROMEDIO);
@@ -39,10 +38,6 @@ public class MotorCluster {
         }
 
         this.vectores = vectores;
-        this.estadisticas = new EstadisticasCluster(
-                vectores.length,
-                calculadorLanceWilliams.getTipoEnlace()
-        );
 
         // calcular matriz de distancias inicial
         System.out.println("  [Clustering] Calculando matriz de distancias inicial...");
@@ -58,7 +53,6 @@ public class MotorCluster {
         long duracion = System.currentTimeMillis() - inicio;
 
         System.out.println("  Clustering - Completado en " + (duracion / 1000.0) + " segundos");
-        System.out.println("  Clustering - Total de fusiones: " + estadisticas.getNumeroFusiones());
 
         return fusionador.getClusterRaiz();
     }
@@ -88,7 +82,6 @@ public class MotorCluster {
 
             // obtener distancia de fusion
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
-            estadisticas.registrarFusion(distanciaFusion);
 
             // actualizar matriz de distancias usando Lance-Williams
             calculadorLanceWilliams.actualizarMatriz(
@@ -131,14 +124,6 @@ public class MotorCluster {
         }
     }
 
-    public ListaDoble<Double> obtenerDistanciasFusion() {
-        return estadisticas != null ? estadisticas.getDistanciasFusion() : new ListaDoble<>();
-    }
-
-    public int obtenerNumeroFusiones() {
-        return estadisticas != null ? estadisticas.getNumeroFusiones() : 0;
-    }
-
     public void setTipoEnlace(TipoEnlace tipo) {
         calculadorLanceWilliams.setTipoEnlace(convertirTipoEnlace(tipo));
     }
@@ -151,17 +136,8 @@ public class MotorCluster {
         Dendrograma dendo = new Dendrograma();
         System.out.println("Dendrograma");
         System.out.println("Tipo de enlace: " + getTipoEnlace());
-        System.out.println("Distancias de fusión: " + obtenerNumeroFusiones());
         System.out.println();
         System.out.println(dendo.toStringArbol(raiz));
-    }
-
-    public void imprimirEstadisticas() {
-        if (estadisticas != null) {
-            estadisticas.imprimir();
-        } else {
-            System.out.println("No hay estadísticas disponibles. Ejecute el clustering primero.");
-        }
     }
 
     @Override
