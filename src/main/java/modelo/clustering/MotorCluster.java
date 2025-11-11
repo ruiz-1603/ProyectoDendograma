@@ -39,20 +39,13 @@ public class MotorCluster {
 
         this.vectores = vectores;
 
-        // calcular matriz de distancias inicial
-        System.out.println("  [Clustering] Calculando matriz de distancias inicial...");
         matrizDistancias = calculadorMatriz.calcular(vectores, tipoDistancia);
 
         // inicializar clusters (uno por vector)
         String[] etiquetas = extraerEtiquetas(vectores);
         fusionador.inicializar(etiquetas);
 
-        // ejecutar algoritmo de clustering
-        long inicio = System.currentTimeMillis();
         ejecutarAlgoritmo();
-        long duracion = System.currentTimeMillis() - inicio;
-
-        System.out.println("  Clustering - Completado en " + (duracion / 1000.0) + " segundos");
 
         return fusionador.getClusterRaiz();
     }
@@ -83,7 +76,7 @@ public class MotorCluster {
             // obtener distancia de fusion
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
 
-            // actualizar matriz de distancias usando Lance-Williams
+            // actualizar matriz de distancias
             actualizadorMatriz.actualizarMatriz(
                     matrizDistancias,
                     i, j,
@@ -130,14 +123,6 @@ public class MotorCluster {
 
     public TipoEnlace getTipoEnlace() {
         return convertirDesdeActualizador(actualizadorMatriz.getTipoEnlace());
-    }
-
-    public void imprimirDendrograma(Nodo raiz) {
-        Dendrograma dendo = new Dendrograma();
-        System.out.println("Dendrograma");
-        System.out.println("Tipo de enlace: " + getTipoEnlace());
-        System.out.println();
-        System.out.println(dendo.toStringArbol(raiz));
     }
 
     @Override

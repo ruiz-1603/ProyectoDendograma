@@ -61,7 +61,7 @@ public class FusionadorCluster {
 
         int nuevoTamano = tamanosClusters[i] + tamanosClusters[j];
 
-        // remover clusters antiguos (mayor primero para no cambiar indices)
+        // se elimina primero el mayor para no cambiar indices
         if (i > j) {
             clusters.eliminarElemento(clusterI);
             tamanosClusters = removerIndice(tamanosClusters, i);
@@ -78,13 +78,6 @@ public class FusionadorCluster {
         tamanosClusters = agregarElemento(tamanosClusters, nuevoTamano);
 
         return nuevoCluster;
-    }
-
-    public int getTamanoCluster(int indice) {
-        if (indice >= 0 && indice < tamanosClusters.length) {
-            return tamanosClusters[indice];
-        }
-        return 0;
     }
 
     public int[] getTamanosClusters() {

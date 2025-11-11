@@ -14,7 +14,7 @@ public class Ponderador {
             throw new IllegalArgumentException("Array de pesos no puede estar vacío");
         }
 
-        // validar que todos los pesos sean no-negativos
+        // validar que todos los pesos sean no negativos
         for (double peso : pesos) {
             if (peso < 0) {
                 throw new IllegalArgumentException("Los pesos no pueden ser negativos");
@@ -98,21 +98,6 @@ public class Ponderador {
         return false;
     }
 
-    public void imprimir() {
-        System.out.println("=== Ponderador ===");
-        System.out.println("Dimensiones: " + pesos.length);
-        System.out.println("Ponderación activa: " + tienePonderacion());
-        System.out.println();
-
-        for (int i = 0; i < pesos.length; i++) {
-            System.out.printf("%3d. %-30s → peso: %.4f%n",
-                    i, nombresDimensiones[i], pesos[i]);
-        }
-
-        double suma = 0;
-        for (double p : pesos) suma += p;
-        System.out.printf("%nSuma de pesos: %.4f%n", suma);
-    }
 
     @Override
     public String toString() {

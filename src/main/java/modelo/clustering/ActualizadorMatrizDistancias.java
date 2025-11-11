@@ -18,12 +18,12 @@ public class ActualizadorMatrizDistancias {
     }
 
     public void actualizarMatriz(Matriz matrizDistancias, int i, int j,
-                                 double distanciaIJ, int[] tamanoClusters,
-                                 int numeroClusters) {
+                                 double distanciaIJ, int[] tamanoClusters, int numeroClusters) {
+
         int ni = tamanoClusters[i];
         int nj = tamanoClusters[j];
 
-        ParametrosActualizacion params = calcularParametros(ni, nj);
+        ParametrosActualizacion parametros = calcularParametros(ni, nj);
 
         for (int k = 0; k < numeroClusters; k++) {
             if (k == i || k == j) continue;
@@ -31,9 +31,10 @@ public class ActualizadorMatrizDistancias {
             double distanciaIK = matrizDistancias.getPosicion(i, k);
             double distanciaJK = matrizDistancias.getPosicion(j, k);
 
-            double nuevaDistancia = params.alphaI * distanciaIK +
-                    params.alphaJ * distanciaJK +
-                    params.gamma * distanciaIJ;
+            // d(ij, k) = αi * d(i,k) + αj * d(j,k) + γ * d(i,j)
+            double nuevaDistancia = parametros.alphaI * distanciaIK +
+                    parametros.alphaJ * distanciaJK +
+                    parametros.gamma * distanciaIJ;
 
             matrizDistancias.setPosicion(i, k, nuevaDistancia);
             matrizDistancias.setPosicion(k, i, nuevaDistancia);
