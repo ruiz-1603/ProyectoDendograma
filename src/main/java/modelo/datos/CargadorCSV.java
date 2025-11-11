@@ -64,7 +64,7 @@ public class CargadorCSV {
         }
 
         Vector[] vectores = transformador.transformar(datos);
-        System.out.println("✓ Vectores creados: " + vectores.length);
+        System.out.println(" Vectores creados: " + vectores.length);
         if (vectores.length > 0) {
             System.out.println("  - Dimensión de cada vector: " + vectores[0].dimension());
         }
