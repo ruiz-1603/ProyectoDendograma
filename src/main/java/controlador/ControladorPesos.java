@@ -21,7 +21,6 @@ public class ControladorPesos {
 
     @FXML
     public void initialize() {
-        // Nada que inicializar aquí por ahora
     }
 
     public void inicializarDatos(String[] nombresDimensiones, double[] pesosActuales) {
@@ -53,7 +52,6 @@ public class ControladorPesos {
             guardado = true;
             cerrarVentana();
         } catch (NumberFormatException e) {
-            // Opcional: Mostrar un diálogo de error al usuario
             System.err.println("Error: Ingrese un número válido para el peso.");
         }
     }

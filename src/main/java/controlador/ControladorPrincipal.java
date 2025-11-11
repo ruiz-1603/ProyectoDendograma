@@ -89,12 +89,12 @@ public class ControladorPrincipal {
             lblEstado.setText("Cargando archivo CSV...");
 
             cargador = new CargadorCSV();
-            cargador.cargar(archivo.getAbsolutePath(), 70);
+            cargador.cargar(archivo.getAbsolutePath(), 50);
 
             vectores = cargador.getVectores();
             selector = new SelectorColumnas(cargador.getNombresDimensiones());
             
-            // La configuración ahora se basa en los nombres de dimensiones finales
+            // la configuracion ahora se basa en los nombres de dimensiones finales
             this.configs = null; 
 
             double[] pesos = new double[cargador.getDimensiones()];
@@ -174,7 +174,6 @@ public class ControladorPrincipal {
             if (controller.isGuardado()) {
                 this.configs = controller.getConfigs();
 
-                // La lógica de traducción ya no es necesaria, los nombres en configs son los finales
                 ListaDoble<String> finalNamesToSelect = new ListaDoble<>();
                 for (int i = 0; i < configs.tamanio(); i++) {
                     VariableConfig config = configs.obtener(i);

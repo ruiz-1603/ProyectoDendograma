@@ -76,7 +76,6 @@ public class MotorCluster {
         while (fusionador.tieneMasDeUnCluster()) {
             iteracion++;
 
-            // encontrar el par de clusters más próximo
             int[] parMin = fusionador.encontrarParMasProximo(matrizDistancias);
             int i = parMin[0];
             int j = parMin[1];
@@ -87,12 +86,11 @@ public class MotorCluster {
                 break;
             }
 
-            // obtener distancia de fusión
+            // obtener distancia de fusion
             double distanciaFusion = matrizDistancias.getPosicion(i, j);
             estadisticas.registrarFusion(distanciaFusion);
 
             // actualizar matriz de distancias usando Lance-Williams
-            // (ANTES de fusionar, porque necesitamos los índices i, j originales)
             calculadorLanceWilliams.actualizarMatriz(
                     matrizDistancias,
                     i, j,
@@ -101,7 +99,6 @@ public class MotorCluster {
                     fusionador.getNumeroClusters()
             );
 
-            // fusionar los clusters i y j
             fusionador.fusionar(i, j, distanciaFusion);
         }
     }

@@ -41,7 +41,6 @@ public class ControladorVariables {
         this.filasUI.limpiar();
         this.vboxVariables.getChildren().clear();
 
-        // --- Master Normalization Control ---
         Label masterLabel = new Label("Aplicar a todo (Numérico):");
         ComboBox<String> masterNormalizacionBox = new ComboBox<>(normalizacionOptions);
         masterNormalizacionBox.setPromptText("Seleccionar...");
@@ -68,7 +67,6 @@ public class ControladorVariables {
 
         vboxVariables.getChildren().add(masterBox);
         vboxVariables.getChildren().add(new Separator());
-        // --- Fin Master Control ---
 
         if (configsExistentes == null || configsExistentes.tamanio() == 0) {
             for (String columna : todasLasColumnas) {
